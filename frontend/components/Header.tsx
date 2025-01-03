@@ -11,9 +11,12 @@ const Header = () => {
           mern auth
         </Link>
 
-        <nav>
+        <nav className="space-x-4">
           <Link href="/login" className="text-white hover:text-gray-300">
             Login
+          </Link>
+          <Link href="/settings" className="text-white hover:text-gray-300">
+            Settings
           </Link>
         </nav>
       </div>
