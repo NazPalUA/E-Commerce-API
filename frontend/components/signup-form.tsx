@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { AuthCard } from './ui/auth-card';
+import { GoogleIcon } from './ui/icons';
 import { InputGroup } from './ui/input-group';
 
 export function SignUpForm({
@@ -49,6 +50,7 @@ export function SignUpForm({
             Create account
           </Button>
           <Button variant="outline" className="w-full">
+            <GoogleIcon className="size-4" />
             Sign up with Google
           </Button>
         </div>

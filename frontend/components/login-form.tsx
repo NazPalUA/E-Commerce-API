@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { AuthCard } from './ui/auth-card';
 import { Checkbox } from './ui/checkbox';
+import { GoogleIcon } from './ui/icons';
 import { InputGroup } from './ui/input-group';
 
 export function LoginForm({
@@ -61,6 +62,7 @@ export function LoginForm({
             Login
           </Button>
           <Button variant="outline" className="w-full">
+            <GoogleIcon className="size-4" />
             Login with Google
           </Button>
         </div>
