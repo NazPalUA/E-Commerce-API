@@ -3,9 +3,9 @@ import { z } from 'zod';
 
 export class ServiceResponse<T = null> {
   readonly success: boolean;
+  readonly statusCode: number;
   readonly message: string;
   readonly responseObject: T;
-  readonly statusCode: number;
 
   private constructor(
     success: boolean,
