@@ -13,7 +13,7 @@ const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
       null,
       err.statusCode
     );
-    return handleServiceResponse(serviceResponse, res);
+    handleServiceResponse(serviceResponse, res);
   }
 
   if (err instanceof ZodError) {
@@ -25,7 +25,7 @@ const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
       null,
       StatusCodes.BAD_REQUEST
     );
-    return handleServiceResponse(serviceResponse, res);
+    handleServiceResponse(serviceResponse, res);
   }
 
   logger.error(err);
@@ -35,7 +35,7 @@ const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
     null,
     StatusCodes.INTERNAL_SERVER_ERROR
   );
-  return handleServiceResponse(serviceResponse, res);
+  handleServiceResponse(serviceResponse, res);
 };
 
 export default errorHandler;
