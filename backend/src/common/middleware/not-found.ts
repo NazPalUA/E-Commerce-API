@@ -9,7 +9,7 @@ const notFound = (_req: Request, res: Response) => {
     null,
     StatusCodes.NOT_FOUND
   );
-  return handleServiceResponse(serviceResponse, res);
+  handleServiceResponse(serviceResponse, res);
 };
 
 export default notFound;
