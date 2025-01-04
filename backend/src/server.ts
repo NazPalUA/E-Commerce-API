@@ -39,6 +39,6 @@ app.use(notFound);
 app.use(openAPIRouter);
 
 // Error handlers
-app.use(errorHandler());
+app.use(errorHandler);
 
 export { app, logger };
