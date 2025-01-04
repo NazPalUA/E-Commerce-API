@@ -7,6 +7,7 @@ import { openAPIRouter } from '@/api-docs/openAPIRouter';
 import { healthCheckRouter } from '@/api/healthCheck/healthCheckRouter';
 import { userRouter } from '@/api/user/userRouter';
 import errorHandler from '@/common/middleware/errorHandler';
+import notFound from '@/common/middleware/not-found';
 import rateLimiter from '@/common/middleware/rateLimiter';
 import requestLogger from '@/common/middleware/requestLogger';
 import { env } from '@/common/utils/envConfig';
@@ -30,6 +31,9 @@ app.use(requestLogger);
 // Routes
 app.use('/api/v1/health-check', healthCheckRouter);
 app.use('/api/v1/users', userRouter);
+
+// Not found
+app.use(notFound);
 
 // Swagger UI
 app.use(openAPIRouter);
