@@ -32,11 +32,11 @@ app.use(requestLogger);
 app.use('/api/v1/health-check', healthCheckRouter);
 app.use('/api/v1/users', userRouter);
 
+// Swagger UI
+app.use('/api/v1/docs', openAPIRouter);
+
 // Not found
 app.use(notFound);
-
-// Swagger UI
-app.use(openAPIRouter);
 
 // Error handlers
 app.use(errorHandler);
