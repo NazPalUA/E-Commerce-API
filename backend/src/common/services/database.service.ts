@@ -1,31 +1,34 @@
-import { User } from '@/api/user/userModel';
+import { UserEntity } from '@/api/user/userModel';
 import { env } from '@/common/utils/envConfig';
 import { Collection, Db, MongoClient } from 'mongodb';
+import { pino } from 'pino';
 
-export const collections: { users?: Collection<User> } = {};
+const logger = pino({ name: 'database-service' });
+
+interface DatabaseCollections {
+  users: Collection<UserEntity>;
+}
+
+// Initialize collections with a type assertion to avoid undefined
+export const collections = {} as DatabaseCollections;
 
 const client = new MongoClient(env.MONGODB_URI);
 
 export async function connectDB(): Promise<Db> {
   try {
     await client.connect();
-    console.log('Connected to MongoDB');
+    logger.info('Connected to MongoDB');
 
     const db = client.db(env.DB_NAME);
 
-    // Setup your collections
-    const usersCollection = db.collection<User>(env.USERS_COLLECTION);
-    collections.users = usersCollection;
+    collections.users = db.collection<UserEntity>(env.USERS_COLLECTION);
 
-    console.log(
-      `Successfully connected to database: ${db.databaseName} 
-       and collection: ${usersCollection.collectionName}`
-    );
+    logger.info(`Successfully connected to database: ${db.databaseName}`);
 
     return db;
   } catch (error) {
-    console.error('MongoDB connection error:', error);
-    console.error('Please make sure MongoDB is running on your system');
+    logger.error('MongoDB connection error:', error);
+    logger.error('Please make sure MongoDB is running on your system');
     process.exit(1);
   }
 }
