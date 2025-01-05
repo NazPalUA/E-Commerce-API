@@ -1,7 +1,11 @@
 import type { Request, RequestHandler, Response } from 'express';
 
 import { userService } from '@/api/user/userService';
-import { handleServiceResponse } from '@/common/utils/httpHandlers';
+import {
+  handleServiceResponse,
+  validateReq,
+} from '@/common/utils/httpHandlers';
+import { CreateUserReqSchema, GetUserReqSchema } from './userModel';
 
 class UserController {
   public getUsers: RequestHandler = async (_req: Request, res: Response) => {
@@ -10,13 +14,16 @@ class UserController {
   };
 
   public getUser: RequestHandler = async (req: Request, res: Response) => {
-    const id = req.params.id;
-    const serviceResponse = await userService.findById(id);
+    const { params } = validateReq(req, GetUserReqSchema);
+
+    const serviceResponse = await userService.findById(params.id);
     handleServiceResponse(serviceResponse, res);
   };
 
   public createUser: RequestHandler = async (req: Request, res: Response) => {
-    const serviceResponse = await userService.createUser(req.body);
+    const { body } = validateReq(req, CreateUserReqSchema);
+
+    const serviceResponse = await userService.createUser(body);
     handleServiceResponse(serviceResponse, res);
   };
 }

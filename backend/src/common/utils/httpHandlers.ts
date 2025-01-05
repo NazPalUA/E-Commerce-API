@@ -1,7 +1,6 @@
-import type { NextFunction, Request, Response } from 'express';
-import type { ZodSchema } from 'zod';
-
 import { ServiceResponse } from '@/common/models/serviceResponse';
+import type { Request, Response } from 'express';
+import { infer as ZodInfer, ZodObject } from 'zod';
 
 export const handleServiceResponse = (
   serviceResponse: ServiceResponse<any>,
@@ -10,8 +9,16 @@ export const handleServiceResponse = (
   return response.status(serviceResponse.statusCode).send(serviceResponse);
 };
 
-export const validateRequest =
-  (schema: ZodSchema) => (req: Request, res: Response, next: NextFunction) => {
-    schema.parse({ body: req.body, query: req.query, params: req.params });
-    next();
-  };
+export function validateReq<TSchema extends ZodObject<any>>(
+  req: Request,
+  schema: TSchema
+): ZodInfer<TSchema> {
+  const { shape } = schema;
+  const data: Partial<Record<keyof typeof shape, unknown>> = {};
+
+  if ('body' in shape) data.body = req.body;
+  if ('query' in shape) data.query = req.query;
+  if ('params' in shape) data.params = req.params;
+
+  return schema.parse(data);
+}

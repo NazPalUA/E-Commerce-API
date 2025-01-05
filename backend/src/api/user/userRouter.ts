@@ -8,7 +8,6 @@ import {
   GetUserReqSchema,
   UserDTOSchema,
 } from '@/api/user/userModel';
-import { validateRequest } from '@/common/utils/httpHandlers';
 import { userController } from './userController';
 
 export const userRegistry = new OpenAPIRegistry();
@@ -33,11 +32,7 @@ userRegistry.registerPath({
   responses: createApiResponse(UserDTOSchema, 'Success'),
 });
 
-userRouter.get(
-  '/:id',
-  validateRequest(GetUserReqSchema),
-  userController.getUser
-);
+userRouter.get('/:id', userController.getUser);
 
 userRegistry.registerPath({
   method: 'post',
@@ -55,8 +50,4 @@ userRegistry.registerPath({
   responses: createApiResponse(UserDTOSchema, 'Success'),
 });
 
-userRouter.post(
-  '/',
-  validateRequest(CreateUserReqSchema),
-  userController.createUser
-);
+userRouter.post('/', userController.createUser);
