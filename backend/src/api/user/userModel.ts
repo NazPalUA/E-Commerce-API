@@ -2,7 +2,6 @@ import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import { z } from 'zod';
 
 import { commonValidations } from '@/common/utils/commonValidation';
-import { ObjectId } from 'mongodb';
 
 extendZodWithOpenApi(z);
 
@@ -10,7 +9,7 @@ export type UserEntity = z.infer<typeof UserEntitySchema>;
 export type UserDTO = z.infer<typeof UserDTOSchema>;
 
 export const UserEntitySchema = z.object({
-  _id: z.instanceof(ObjectId),
+  _id: commonValidations.objectId,
   name: z.string(),
   email: z.string().email(),
   age: z.number(),
