@@ -8,28 +8,34 @@ import { handleServiceResponse } from '../utils/httpHandlers';
 
 const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
   if (err instanceof BaseError) {
+    logger.error(`[BaseError] ${err.statusCode} - ${err.message}`);
     const serviceResponse = ServiceResponse.failure(
       err.message,
       null,
       err.statusCode
     );
     handleServiceResponse(serviceResponse, res);
+    return;
   }
 
   if (err instanceof ZodError) {
-    const errorMessage = `Invalid input: ${err.errors
-      .map(e => e.message)
-      .join(', ')}`;
+    const issueSummaries = err.issues.map(issue => {
+      const path = issue.path.join('.');
+      return `(${path}) ${issue.message}`;
+    });
+
+    logger.error(`[ZodError] Invalid input: ${issueSummaries.join(', ')}`);
+
     const serviceResponse = ServiceResponse.failure(
-      errorMessage,
+      `Invalid input: ${issueSummaries.join(', ')}`,
       null,
       StatusCodes.BAD_REQUEST
     );
     handleServiceResponse(serviceResponse, res);
+    return;
   }
 
-  logger.error(err);
-
+  logger.error(`[UnhandledError] ${err}`);
   const serviceResponse = ServiceResponse.failure(
     'An unknown error occurred',
     null,
