@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from 'express';
 import pino from 'pino';
 
-const logger = pino({ name: 'Logger' });
+const logger = pino({ name: 'Req Logger' });
 
 const requestLogger = (req: Request, res: Response, next: NextFunction) => {
   const startTime = process.hrtime();
