@@ -1,14 +1,16 @@
-import { logger } from '@/server';
 import type { ErrorRequestHandler } from 'express';
 import { StatusCodes } from 'http-status-codes';
+import pino from 'pino';
 import { ZodError } from 'zod';
 import { BaseError } from '../errors/base-error';
 import { ServiceResponse } from '../models/serviceResponse';
 import { handleServiceResponse } from '../utils/httpHandlers';
 
+const logger = pino({ name: 'Error Handler' });
+
 const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
   if (err instanceof BaseError) {
-    logger.error(`[BaseError] ${err.statusCode} - ${err.message}`);
+    logger.warn(`[BaseError] ${err.statusCode} - ${err.message}`);
     const serviceResponse = ServiceResponse.failure(
       err.message,
       null,
@@ -24,7 +26,7 @@ const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
       return `(${path}) ${issue.message}`;
     });
 
-    logger.error(`[ZodError] Invalid input: ${issueSummaries.join(', ')}`);
+    logger.warn(`[ZodError] Invalid input: ${issueSummaries.join(', ')}`);
 
     const serviceResponse = ServiceResponse.failure(
       `Invalid input: ${issueSummaries.join(', ')}`,
