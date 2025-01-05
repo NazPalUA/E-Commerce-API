@@ -1,4 +1,4 @@
-import { UserEntity } from '@/api/user/userModel';
+import { User_DbEntity } from '@/api/user/userModel';
 import { env } from '@/common/utils/envConfig';
 import { Collection, Db, MongoClient } from 'mongodb';
 import { pino } from 'pino';
@@ -6,7 +6,7 @@ import { pino } from 'pino';
 const logger = pino({ name: 'database-service' });
 
 interface DatabaseCollections {
-  users: Collection<UserEntity>;
+  users: Collection<User_DbEntity>;
 }
 
 // Initialize collections with a type assertion to avoid undefined
@@ -21,7 +21,7 @@ export async function connectDB(): Promise<Db> {
 
     const db = client.db(env.DB_NAME);
 
-    collections.users = db.collection<UserEntity>(env.USERS_COLLECTION);
+    collections.users = db.collection<User_DbEntity>(env.USERS_COLLECTION);
 
     logger.info(`Successfully connected to database: ${db.databaseName}`);
 

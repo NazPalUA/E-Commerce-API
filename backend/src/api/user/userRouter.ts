@@ -4,22 +4,22 @@ import { z } from 'zod';
 
 import { createApiResponse } from '@/api-docs/openAPIResponseBuilders';
 import {
-  CreateUserReqSchema,
-  GetUserReqSchema,
-  UserDTOSchema,
+  CreateUser_Req_Schema,
+  GetUser_Req_Schema,
+  User_DTO_Schema,
 } from '@/api/user/userModel';
 import { userController } from './userController';
 
 export const userRegistry = new OpenAPIRegistry();
 export const userRouter: Router = express.Router();
 
-userRegistry.register('User', UserDTOSchema);
+userRegistry.register('User', User_DTO_Schema);
 
 userRegistry.registerPath({
   method: 'get',
   path: '/users',
   tags: ['User'],
-  responses: createApiResponse(z.array(UserDTOSchema), 'Success'),
+  responses: createApiResponse(z.array(User_DTO_Schema), 'Success'),
 });
 
 userRouter.get('/', userController.getUsers);
@@ -28,8 +28,8 @@ userRegistry.registerPath({
   method: 'get',
   path: '/users/{id}',
   tags: ['User'],
-  request: { params: GetUserReqSchema.shape.params },
-  responses: createApiResponse(UserDTOSchema, 'Success'),
+  request: { params: GetUser_Req_Schema.shape.params },
+  responses: createApiResponse(User_DTO_Schema, 'Success'),
 });
 
 userRouter.get('/:id', userController.getUser);
@@ -42,12 +42,12 @@ userRegistry.registerPath({
     body: {
       content: {
         'application/json': {
-          schema: CreateUserReqSchema.shape.body,
+          schema: CreateUser_Req_Schema.shape.body,
         },
       },
     },
   },
-  responses: createApiResponse(UserDTOSchema, 'Success'),
+  responses: createApiResponse(User_DTO_Schema, 'Success'),
 });
 
 userRouter.post('/', userController.createUser);

@@ -5,10 +5,10 @@ import { commonValidations } from '@/common/utils/commonValidation';
 
 extendZodWithOpenApi(z);
 
-export type UserEntity = z.infer<typeof UserEntitySchema>;
-export type UserDTO = z.infer<typeof UserDTOSchema>;
+export type User_DbEntity = z.infer<typeof User_DbEntity_Schema>;
+export type User_DTO = z.infer<typeof User_DTO_Schema>;
 
-export const UserEntitySchema = z.object({
+export const User_DbEntity_Schema = z.object({
   _id: commonValidations.objectId,
   name: z.string(),
   email: z.string().email(),
@@ -17,25 +17,25 @@ export const UserEntitySchema = z.object({
   updatedAt: z.date(),
 });
 
-export const UserDTOSchema = UserEntitySchema.omit({ _id: true }).extend({
+export const User_DTO_Schema = User_DbEntity_Schema.omit({ _id: true }).extend({
   id: commonValidations.id,
 });
 
 // Input Validation for 'GET users/:id' endpoint
-export type GetUserReq = z.infer<typeof GetUserReqSchema>;
-export const GetUserReqSchema = z.object({
+export type GetUser_Req = z.infer<typeof GetUser_Req_Schema>;
+export const GetUser_Req_Schema = z.object({
   params: z.object({ id: commonValidations.id }),
 });
 
 // Input Validation for 'POST /users' endpoint
-export type CreateUserReqBody = z.infer<typeof CreateUserReqBodySchema>;
+export type CreateUser_ReqBody = z.infer<typeof CreateUser_ReqBody_Schema>;
 
-export const CreateUserReqBodySchema = UserDTOSchema.omit({
+export const CreateUser_ReqBody_Schema = User_DTO_Schema.omit({
   id: true,
   createdAt: true,
   updatedAt: true,
 });
 
-export const CreateUserReqSchema = z.object({
-  body: CreateUserReqBodySchema,
+export const CreateUser_Req_Schema = z.object({
+  body: CreateUser_ReqBody_Schema,
 });
