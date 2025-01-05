@@ -1,24 +1,13 @@
-import type {
-  CreateUserReqBody,
-  UserDTO,
-  UserEntity,
-} from '@/api/user/userModel';
 import { NotFoundError } from '@/common/errors/not-found-error';
 import { ServiceResponse } from '@/common/models/serviceResponse';
 import { collections } from '@/common/services/database.service';
+import { toDTO } from '@/common/utils/toDTO';
 import { Collection, ObjectId } from 'mongodb';
+import type { CreateUserReqBody, UserDTO, UserEntity } from './userModel';
 
 export class UserService {
   private get collection(): Collection<UserEntity> {
     return collections.users;
-  }
-
-  private toDTO(user: UserEntity): UserDTO {
-    const { _id, ...rest } = user;
-    return {
-      id: _id.toString(),
-      ...rest,
-    };
   }
 
   async createUser(user: CreateUserReqBody): Promise<ServiceResponse<UserDTO>> {
@@ -30,10 +19,7 @@ export class UserService {
     };
     await this.collection.insertOne(newUser);
 
-    return ServiceResponse.success<UserDTO>(
-      'User created',
-      this.toDTO(newUser)
-    );
+    return ServiceResponse.success<UserDTO>('User created', toDTO(newUser));
   }
 
   async findAll(): Promise<ServiceResponse<UserDTO[] | null>> {
@@ -42,10 +28,7 @@ export class UserService {
       throw new NotFoundError('No Users');
     }
 
-    return ServiceResponse.success<UserDTO[]>(
-      'Users found',
-      users.map(this.toDTO)
-    );
+    return ServiceResponse.success<UserDTO[]>('Users found', users.map(toDTO));
   }
 
   async findById(id: string): Promise<ServiceResponse<UserDTO | null>> {
@@ -53,7 +36,8 @@ export class UserService {
     if (!user) {
       throw new NotFoundError('User');
     }
-    return ServiceResponse.success<UserDTO>('User found', this.toDTO(user));
+
+    return ServiceResponse.success<UserDTO>('User found', toDTO(user));
   }
 }
 
