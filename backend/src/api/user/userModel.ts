@@ -2,6 +2,7 @@ import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import { z } from 'zod';
 
 import { commonValidations } from '@/common/utils/commonValidation';
+import { ObjectId } from 'mongodb';
 
 extendZodWithOpenApi(z);
 
@@ -10,13 +11,13 @@ export type User_DTO = z.infer<typeof User_DTO_Schema>;
 
 export const User_DbEntity_Schema = z
   .object({
-    _id: commonValidations.objectId,
+    _id: commonValidations.objectId.default(new ObjectId()),
     name: z.string().min(3).max(50),
     email: z.string().email(),
     // password: z.string().min(8).max(50),
     role: z.enum(['admin', 'user']).default('user'),
-    createdAt: z.date(),
-    updatedAt: z.date(),
+    createdAt: z.date().default(new Date()),
+    updatedAt: z.date().default(new Date()),
   })
   .strict();
 

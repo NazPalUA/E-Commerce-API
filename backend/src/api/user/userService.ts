@@ -3,7 +3,12 @@ import { ServiceResponse } from '@/common/models/serviceResponse';
 import { collections } from '@/common/services/database.service';
 import { toDTO } from '@/common/utils/toDTO';
 import { Collection, ObjectId } from 'mongodb';
-import type { CreateUser_ReqBody, User_DTO, User_DbEntity } from './userModel';
+import {
+  User_DbEntity_Schema,
+  type CreateUser_ReqBody,
+  type User_DTO,
+  type User_DbEntity,
+} from './userModel';
 
 export class UserService {
   private get collection(): Collection<User_DbEntity> {
@@ -13,12 +18,7 @@ export class UserService {
   async createUser(
     user: CreateUser_ReqBody
   ): Promise<ServiceResponse<User_DTO>> {
-    const newUser: User_DbEntity = {
-      _id: new ObjectId(),
-      ...user,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+    const newUser = User_DbEntity_Schema.parse(user);
     await this.collection.insertOne(newUser);
 
     return ServiceResponse.success<User_DTO>('User created', toDTO(newUser));
