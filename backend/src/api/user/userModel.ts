@@ -14,7 +14,7 @@ export const User_DbEntity_Schema = z
     _id: commonValidations.objectId.default(new ObjectId()),
     name: z.string().min(3).max(50),
     email: z.string().email(),
-    // password: z.string().min(8).max(50),
+    password: z.string(),
     role: z.enum(['admin', 'user']).default('user'),
     createdAt: z.date().default(new Date()),
     updatedAt: z.date().default(new Date()),
