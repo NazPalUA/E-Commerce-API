@@ -19,9 +19,13 @@ export class UserService {
     user: CreateUser_ReqBody
   ): Promise<ServiceResponse<User_DTO>> {
     const newUser = User_DbEntity_Schema.parse(user);
-    await this.collection.insertOne(newUser);
+    const result = await this.collection.insertOne(newUser);
+    const insertedUser = { ...newUser, _id: result.insertedId };
 
-    return ServiceResponse.success<User_DTO>('User created', toDTO(newUser));
+    return ServiceResponse.success<User_DTO>(
+      'User created',
+      toDTO(insertedUser)
+    );
   }
 
   async findAll(): Promise<ServiceResponse<User_DTO[] | null>> {

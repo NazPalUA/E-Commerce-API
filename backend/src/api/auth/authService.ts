@@ -28,12 +28,13 @@ export class AuthService {
     };
 
     const userEntity = User_DbEntity_Schema.parse(newUser);
-    console.log(userEntity);
-    await this.collection.insertOne(userEntity);
+
+    const result = await this.collection.insertOne(userEntity);
+    const insertedUser = { ...userEntity, _id: result.insertedId };
 
     return ServiceResponse.success<User_DTO>(
       'User registered',
-      toDTO(userEntity)
+      toDTO(insertedUser)
     );
   }
 
