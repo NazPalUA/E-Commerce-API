@@ -26,7 +26,7 @@ export class UserService {
 
   async findAll(): Promise<ServiceResponse<User_DTO[] | null>> {
     const users = await this.collection.find().toArray();
-    if (!users || users.length === 0) {
+    if (!users.length) {
       throw new NotFoundError('No Users');
     }
 
