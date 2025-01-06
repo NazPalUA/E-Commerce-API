@@ -27,10 +27,10 @@ export class AuthService {
       password: hashedPassword,
     };
 
-    const userEntity = User_DbEntity_Schema.parse(newUser);
+    const userToInsert = User_DbEntity_Schema.parse(newUser);
 
-    const result = await this.collection.insertOne(userEntity);
-    const insertedUser = { ...userEntity, _id: result.insertedId };
+    const result = await this.collection.insertOne(userToInsert);
+    const insertedUser = { ...userToInsert, _id: result.insertedId };
 
     return ServiceResponse.success<User_DTO>(
       'User registered',
