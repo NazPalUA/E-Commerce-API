@@ -24,9 +24,12 @@ export class AuthService {
   ): Promise<ServiceResponse<User_DTO>> {
     const { password, ...rest } = userData;
     const hashedPassword = await bcrypt.hash(password, 10);
+    const isFirstUser = (await this.collection.countDocuments()) === 0;
+
     const newUser = {
       ...rest,
       password: hashedPassword,
+      role: isFirstUser ? 'admin' : 'user',
     };
 
     const userToInsert = User_DbEntity_Schema.parse(newUser);
