@@ -1,6 +1,8 @@
 import { NotFoundError } from '@/common/errors/not-found-error';
+import { UnauthorizedError } from '@/common/errors/unauthorized-error';
 import { ServiceResponse } from '@/common/models/serviceResponse';
 import { collections } from '@/common/services/database.service';
+import { env } from '@/common/utils/envConfig';
 import { toDTO } from '@/common/utils/toDTO';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -44,15 +46,15 @@ export class AuthService {
     const { email, password } = credentials;
     const user = await this.collection.findOne({ email });
     if (!user) {
-      throw new NotFoundError('User not found');
+      throw new NotFoundError('User');
     }
 
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
-      throw new Error('Invalid credentials');
+      throw new UnauthorizedError('Invalid credentials');
     }
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET as string, {
+    const token = jwt.sign({ id: user._id }, env.JWT_SECRET, {
       expiresIn: '1h',
     });
 
@@ -63,13 +65,15 @@ export class AuthService {
 
   async logout(userId: string): Promise<ServiceResponse<null>> {
     // Implement logout logic if necessary
+    // Note: With JWT, typically no server-side logout is needed
+    // You might want to implement a token blacklist if required
     return ServiceResponse.success<null>('Logout successful', null);
   }
 
   async getCurrentUser(userId: string): Promise<ServiceResponse<User_DTO>> {
     const user = await this.collection.findOne({ _id: new ObjectId(userId) });
     if (!user) {
-      throw new NotFoundError('User not found');
+      throw new NotFoundError('User');
     }
 
     return ServiceResponse.success<User_DTO>(
