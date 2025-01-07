@@ -29,13 +29,13 @@ app.use(rateLimiter);
 // Request logging
 app.use(requestLogger);
 
+// Swagger UI
+app.use('/', openAPIRouter);
+
 // Routes
 app.use('/api/v1/health-check', healthCheckRouter);
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/users', userRouter);
-
-// Swagger UI
-app.use('/api/v1/docs', openAPIRouter);
 
 // Not found
 app.use(notFound);
