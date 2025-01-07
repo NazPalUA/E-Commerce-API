@@ -50,7 +50,7 @@ class AuthService {
     }
 
     const token = jwt.sign({ id: user._id }, env.JWT_SECRET, {
-      expiresIn: '1h',
+      expiresIn: env.JWT_EXPIRATION_TIME,
     });
 
     return ServiceResponse.success<{ token: string }>('Login successful', {

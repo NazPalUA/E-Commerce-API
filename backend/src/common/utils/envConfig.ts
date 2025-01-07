@@ -19,4 +19,5 @@ export const env = cleanEnv(process.env, {
   PRODUCTS_COLLECTION: str({ default: 'products' }),
   ORDERS_COLLECTION: str({ default: 'orders' }),
   JWT_SECRET: str(),
+  JWT_EXPIRATION_TIME: str({ default: '1h' }),
 });
