@@ -9,14 +9,19 @@ import { toDTO } from '@/common/utils/toDTO';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { ObjectId } from 'mongodb';
-import { Login_ReqBody, Register_ReqBody } from './authModel';
+import {
+  Login_ReqBody,
+  Register_ReqBody,
+  Register_ResObj,
+  UserToken,
+} from './authModel';
 
 class AuthService {
   private userRepo = userRepo;
 
   public async register(
     userData: Register_ReqBody
-  ): Promise<ServiceResponse<User_DTO>> {
+  ): Promise<ServiceResponse<Register_ResObj>> {
     const { password, ...rest } = userData;
     const hashedPassword = await bcrypt.hash(password, 10);
     const isFirstUser = (await this.userRepo.countDocuments()) === 0;
@@ -29,9 +34,25 @@ class AuthService {
 
     const insertedUser = await this.userRepo.insertUser(newUser);
 
-    return ServiceResponse.success<User_DTO>(
+    const tokenUser: UserToken = {
+      id: insertedUser._id.toString(),
+      name: insertedUser.name,
+      email: insertedUser.email,
+      role: insertedUser.role,
+    };
+
+    const token = jwt.sign(tokenUser, env.JWT_SECRET, {
+      expiresIn: env.JWT_EXPIRATION_TIME,
+    });
+
+    const response: Register_ResObj = {
+      user: tokenUser,
+      token,
+    };
+
+    return ServiceResponse.success<Register_ResObj>(
       'User registered',
-      toDTO(insertedUser)
+      response
     );
   }
 

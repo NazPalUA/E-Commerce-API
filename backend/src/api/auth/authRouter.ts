@@ -5,7 +5,11 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { User_DTO_Schema } from '../user/userModel';
 import { getCurrentUser, login, logout, register } from './authController';
-import { Login_Req_Schema, Register_Req_Schema } from './authModel';
+import {
+  Login_Req_Schema,
+  Register_Req_Schema,
+  Register_ResObj_Schema,
+} from './authModel';
 
 export const authRegistry = new OpenAPIRegistry();
 export const authRouter = Router();
@@ -23,7 +27,7 @@ authRegistry.registerPath({
       },
     },
   },
-  responses: createApiResponse(User_DTO_Schema, 'Success'),
+  responses: createApiResponse(Register_ResObj_Schema, 'Success'),
 });
 
 authRouter.post('/register', register);
