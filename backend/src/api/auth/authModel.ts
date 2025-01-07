@@ -1,21 +1,8 @@
-import { User_DbEntity_Schema } from '@/common/db/repos/users/user.model';
-import { commonValidations } from '@/common/utils/commonValidation';
+import { TokenPayload_Schema } from '@/common/utils/jwt';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import { z } from 'zod';
 
 extendZodWithOpenApi(z);
-
-export const UserToken_Schema = User_DbEntity_Schema.pick({
-  name: true,
-  email: true,
-  role: true,
-})
-  .extend({
-    id: commonValidations.id,
-  })
-  .strict();
-
-export type UserToken = z.infer<typeof UserToken_Schema>;
 
 // 'POST /auth/login' endpoint
 export type Login_ReqBody = z.infer<typeof Login_ReqBody_Schema>;
@@ -42,7 +29,7 @@ export const Register_Req_Schema = z.object({
 
 export type Register_ResObj = z.infer<typeof Register_ResObj_Schema>;
 export const Register_ResObj_Schema = z.object({
-  user: UserToken_Schema,
+  user: TokenPayload_Schema,
   token: z.string(),
 });
 
