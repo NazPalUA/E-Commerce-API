@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
-import { env } from '../utils/envConfig';
+import { decodeToken } from '../utils/jwt';
 
 export const authenticate = (
   req: Request,
@@ -15,13 +14,23 @@ export const authenticate = (
   }
 
   try {
-    const decoded = jwt.verify(token, env.JWT_SECRET) as {
-      id: string;
-    };
+    const decoded = decodeToken(token);
     req.userId = decoded.id;
+    req.userRole = decoded.role;
     next();
   } catch (error) {
     res.status(401).json({ message: 'Invalid authentication token' });
+    return;
+  }
+};
+
+export const authenticateAdmin = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
+  if (req.userRole !== 'admin') {
+    res.status(403).json({ message: 'Unauthorized' });
     return;
   }
 };

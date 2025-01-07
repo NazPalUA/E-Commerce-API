@@ -4,11 +4,9 @@ import { userRepo } from '@/common/db/repos/users/user.repo';
 import { NotFoundError } from '@/common/errors/not-found-error';
 import { UnauthorizedError } from '@/common/errors/unauthorized-error';
 import { ServiceResponse } from '@/common/models/serviceResponse';
-import { env } from '@/common/utils/envConfig';
 import { createToken, TokenPayload } from '@/common/utils/jwt';
 import { toDTO } from '@/common/utils/toDTO';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import { ObjectId } from 'mongodb';
 import { Login_ReqBody, Register_ReqBody, Register_ResObj } from './authModel';
 
@@ -64,9 +62,14 @@ class AuthService {
       throw new UnauthorizedError('Invalid credentials');
     }
 
-    const token = jwt.sign({ id: user._id }, env.JWT_SECRET, {
-      expiresIn: env.JWT_EXPIRATION_TIME,
-    });
+    const tokenUser: TokenPayload = {
+      id: user._id.toString(),
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    };
+
+    const token = createToken(tokenUser);
 
     return ServiceResponse.success<{ token: string }>('Login successful', {
       token,
