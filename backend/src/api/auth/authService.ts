@@ -1,9 +1,9 @@
 import { User_DTO } from '@/api/user/userModel';
+import { User_DbEntity } from '@/common/db/repos/users/user.model';
+import { userRepo } from '@/common/db/repos/users/user.repo';
 import { NotFoundError } from '@/common/errors/not-found-error';
 import { UnauthorizedError } from '@/common/errors/unauthorized-error';
 import { ServiceResponse } from '@/common/models/serviceResponse';
-import { User_DbEntity } from '@/common/services/db/repos/users/user.model';
-import { userRepo } from '@/common/services/db/repos/users/user.repo';
 import { env } from '@/common/utils/envConfig';
 import { toDTO } from '@/common/utils/toDTO';
 import bcrypt from 'bcrypt';

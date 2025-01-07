@@ -1,7 +1,7 @@
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import { z } from 'zod';
 
-import { User_DbEntity_Schema } from '@/common/services/db/repos/users/user.model';
+import { User_DbEntity_Schema } from '@/common/db/repos/users/user.model';
 import { commonValidations } from '@/common/utils/commonValidation';
 
 extendZodWithOpenApi(z);

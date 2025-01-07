@@ -1,6 +1,6 @@
+import { userRepo } from '@/common/db/repos/users/user.repo';
 import { NotFoundError } from '@/common/errors/not-found-error';
 import { ServiceResponse } from '@/common/models/serviceResponse';
-import { userRepo } from '@/common/services/db/repos/users/user.repo';
 import { toDTO } from '@/common/utils/toDTO';
 import { ObjectId } from 'mongodb';
 import { type User_DTO } from './userModel';

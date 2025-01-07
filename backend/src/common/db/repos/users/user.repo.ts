@@ -1,5 +1,5 @@
 import { Collection, ObjectId } from 'mongodb';
-import { collections } from '../../db.service';
+import { collections } from '../..';
 import { NewUser, User_DbEntity, User_DbEntity_Schema } from './user.model';
 
 export class UserRepository {
