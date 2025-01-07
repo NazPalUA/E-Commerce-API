@@ -3,11 +3,7 @@ import express, { type Router } from 'express';
 import { z } from 'zod';
 
 import { createApiResponse } from '@/api-docs/openAPIResponseBuilders';
-import {
-  CreateUser_Req_Schema,
-  GetUser_Req_Schema,
-  User_DTO_Schema,
-} from '@/api/user/userModel';
+import { GetUser_Req_Schema, User_DTO_Schema } from '@/api/user/userModel';
 import { userController } from './userController';
 
 export const userRegistry = new OpenAPIRegistry();
@@ -33,21 +29,3 @@ userRegistry.registerPath({
 });
 
 userRouter.get('/:id', userController.getUser);
-
-userRegistry.registerPath({
-  method: 'post',
-  path: '/users',
-  tags: ['User'],
-  request: {
-    body: {
-      content: {
-        'application/json': {
-          schema: CreateUser_Req_Schema.shape.body,
-        },
-      },
-    },
-  },
-  responses: createApiResponse(User_DTO_Schema, 'Success'),
-});
-
-userRouter.post('/', userController.createUser);

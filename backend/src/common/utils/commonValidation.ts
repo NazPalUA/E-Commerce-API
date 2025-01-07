@@ -6,5 +6,5 @@ export const commonValidations = {
     .string()
     .refine(data => ObjectId.isValid(data), 'ID must be a valid ObjectId'),
 
-  objectId: z.instanceof(ObjectId),
+  objectId: z.instanceof(ObjectId).default(new ObjectId()),
 };

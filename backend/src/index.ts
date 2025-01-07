@@ -1,6 +1,6 @@
-import { connectDB } from '@/common/services/database.service';
 import { env } from '@/common/utils/envConfig';
 import { app, logger } from '@/server';
+import { connectDB } from './common/services/db/db.service';
 
 async function startServer() {
   // Attempt DB connection before starting the server
