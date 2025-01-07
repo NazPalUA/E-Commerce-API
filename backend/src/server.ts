@@ -1,9 +1,5 @@
-import cors from 'cors';
-import express, { type Express } from 'express';
-import helmet from 'helmet';
-import { pino } from 'pino';
-
 import { openAPIRouter } from '@/api-docs/openAPIRouter';
+import { authRouter } from '@/api/auth/authRouter';
 import { healthCheckRouter } from '@/api/healthCheck/healthCheckRouter';
 import { userRouter } from '@/api/user/userRouter';
 import errorHandler from '@/common/middleware/errorHandler';
@@ -11,7 +7,10 @@ import notFound from '@/common/middleware/not-found';
 import rateLimiter from '@/common/middleware/rateLimiter';
 import requestLogger from '@/common/middleware/requestLogger';
 import { env } from '@/common/utils/envConfig';
-import authRouter from './api/auth/authRouter';
+import cors from 'cors';
+import express, { type Express } from 'express';
+import helmet from 'helmet';
+import { pino } from 'pino';
 
 const logger = pino({ name: 'server start' });
 const app: Express = express();

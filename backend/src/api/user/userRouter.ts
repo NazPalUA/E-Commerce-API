@@ -1,13 +1,12 @@
-import { OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
-import express, { type Router } from 'express';
-import { z } from 'zod';
-
 import { createApiResponse } from '@/api-docs/openAPIResponseBuilders';
 import { GetUser_Req_Schema, User_DTO_Schema } from '@/api/user/userModel';
+import { OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
+import { Router } from 'express';
+import { z } from 'zod';
 import { getUser, getUsers } from './userController';
 
 export const userRegistry = new OpenAPIRegistry();
-export const userRouter: Router = express.Router();
+export const userRouter = Router();
 
 userRegistry.register('User', User_DTO_Schema);
 
