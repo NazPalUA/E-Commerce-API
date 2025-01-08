@@ -17,12 +17,12 @@ export const TokenPayload_Schema = User_DbEntity_Schema.pick({
   })
   .strict();
 
-export const Token_Schema = TokenPayload_Schema.extend({
+const Token_Schema = TokenPayload_Schema.extend({
   iat: z.number(),
   exp: z.number(),
 });
 
-export const createToken = (payload: TokenPayload) => {
+const createToken = (payload: TokenPayload) => {
   return jwt.sign(payload, env.JWT_SECRET, {
     expiresIn: env.JWT_EXPIRATION_TIME,
   });
