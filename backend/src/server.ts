@@ -7,11 +7,11 @@ import notFound from '@/common/middleware/not-found';
 import rateLimiter from '@/common/middleware/rateLimiter';
 import requestLogger from '@/common/middleware/requestLogger';
 import { env } from '@/common/utils/envConfig';
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express, { type Express } from 'express';
 import helmet from 'helmet';
 import { pino } from 'pino';
-
 const logger = pino({ name: 'server start' });
 const app: Express = express();
 
@@ -24,6 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors({ origin: env.CORS_ORIGIN, credentials: true }));
 app.use(helmet());
 app.use(rateLimiter);
+app.use(cookieParser());
 
 // Request logging
 app.use(requestLogger);

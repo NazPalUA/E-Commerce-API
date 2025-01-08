@@ -4,17 +4,28 @@ import { userRepo } from '@/common/db/repos/users/user.repo';
 import { NotFoundError } from '@/common/errors/not-found-error';
 import { UnauthorizedError } from '@/common/errors/unauthorized-error';
 import { ServiceResponse } from '@/common/models/serviceResponse';
-import { createToken, TokenPayload } from '@/common/utils/jwt';
+import {
+  attachCookiesToResponse,
+  clearCookies,
+  TokenPayload,
+} from '@/common/utils/jwt';
 import { toDTO } from '@/common/utils/toDTO';
 import bcrypt from 'bcrypt';
+import { Response } from 'express';
 import { ObjectId } from 'mongodb';
-import { Login_ReqBody, Register_ReqBody, Register_ResObj } from './authModel';
+import {
+  Login_ReqBody,
+  Login_ResObj,
+  Register_ReqBody,
+  Register_ResObj,
+} from './authModel';
 
 class AuthService {
   private userRepo = userRepo;
 
   public async register(
-    userData: Register_ReqBody
+    userData: Register_ReqBody,
+    res: Response
   ): Promise<ServiceResponse<Register_ResObj>> {
     const { password, ...rest } = userData;
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -35,22 +46,18 @@ class AuthService {
       role: insertedUser.role,
     };
 
-    const token = createToken(tokenUser);
-
-    const response: Register_ResObj = {
-      user: tokenUser,
-      token,
-    };
+    attachCookiesToResponse(res, tokenUser);
 
     return ServiceResponse.success<Register_ResObj>(
       'User registered',
-      response
+      tokenUser
     );
   }
 
   public async login(
-    credentials: Login_ReqBody
-  ): Promise<ServiceResponse<{ token: string }>> {
+    credentials: Login_ReqBody,
+    res: Response
+  ): Promise<ServiceResponse<Login_ResObj>> {
     const { email, password } = credentials;
     const user = await this.userRepo.findUserByEmail(email);
     if (!user) {
@@ -69,15 +76,13 @@ class AuthService {
       role: user.role,
     };
 
-    const token = createToken(tokenUser);
+    attachCookiesToResponse(res, tokenUser);
 
-    return ServiceResponse.success<{ token: string }>('Login successful', {
-      token,
-    });
+    return ServiceResponse.success<Login_ResObj>('Login successful', tokenUser);
   }
 
-  public async logout(userId: string): Promise<ServiceResponse<null>> {
-    // If you want to blacklist JWT or handle user sessions, do it here
+  public async logout(res: Response): Promise<ServiceResponse<null>> {
+    clearCookies(res);
     return ServiceResponse.success<null>('Logout successful', null);
   }
 

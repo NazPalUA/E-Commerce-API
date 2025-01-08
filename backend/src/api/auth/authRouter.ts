@@ -7,6 +7,7 @@ import { User_DTO_Schema } from '../user/userModel';
 import { getCurrentUser, login, logout, register } from './authController';
 import {
   Login_Req_Schema,
+  Login_ResObj_Schema,
   Register_Req_Schema,
   Register_ResObj_Schema,
 } from './authModel';
@@ -43,7 +44,7 @@ authRegistry.registerPath({
       },
     },
   },
-  responses: createApiResponse(User_DTO_Schema, 'Success'),
+  responses: createApiResponse(Login_ResObj_Schema, 'Success'),
 });
 
 authRouter.post('/login', login);

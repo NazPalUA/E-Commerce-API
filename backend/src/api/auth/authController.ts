@@ -8,18 +8,18 @@ import { authService } from './authService';
 
 export const register: RequestHandler = async (req: Request, res: Response) => {
   const { body } = validateReq(req, Register_Req_Schema);
-  const serviceResponse = await authService.register(body);
+  const serviceResponse = await authService.register(body, res);
   handleServiceResponse(serviceResponse, res);
 };
 
 export const login: RequestHandler = async (req: Request, res: Response) => {
   const { body } = validateReq(req, Login_Req_Schema);
-  const serviceResponse = await authService.login(body);
+  const serviceResponse = await authService.login(body, res);
   handleServiceResponse(serviceResponse, res);
 };
 
 export const logout: RequestHandler = async (_req: Request, res: Response) => {
-  const serviceResponse = await authService.logout('id');
+  const serviceResponse = await authService.logout(res);
   handleServiceResponse(serviceResponse, res);
 };
 

@@ -1,3 +1,4 @@
+import { Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { z } from 'zod';
 import { User_DbEntity_Schema } from '../db/repos/users/user.model';
@@ -16,6 +17,11 @@ export const TokenPayload_Schema = User_DbEntity_Schema.pick({
   })
   .strict();
 
+export const Token_Schema = TokenPayload_Schema.extend({
+  iat: z.number(),
+  exp: z.number(),
+});
+
 export const createToken = (payload: TokenPayload) => {
   return jwt.sign(payload, env.JWT_SECRET, {
     expiresIn: env.JWT_EXPIRATION_TIME,
@@ -31,7 +37,8 @@ export const decodeToken = (token: string): TokenPayload => {
   if (!decoded) {
     throw new BadRequestError('Invalid token');
   }
-  return TokenPayload_Schema.parse(decoded);
+
+  return Token_Schema.parse(decoded);
 };
 
 export const refreshToken = (token: string) => {
@@ -41,4 +48,21 @@ export const refreshToken = (token: string) => {
   } catch (error) {
     throw new BadRequestError('Invalid or expired token');
   }
+};
+
+export const attachCookiesToResponse = (
+  res: Response,
+  payload: TokenPayload
+) => {
+  const token = createToken(payload);
+  const oneDay = 24 * 60 * 60 * 1000;
+
+  res.cookie('token', token, {
+    httpOnly: true,
+    expires: new Date(Date.now() + oneDay),
+  });
+};
+
+export const clearCookies = (res: Response) => {
+  res.clearCookie('token');
 };
