@@ -17,7 +17,7 @@ export const TokenPayload_Schema = User_DbEntity_Schema.pick({
   })
   .strict();
 
-const Token_Schema = TokenPayload_Schema.extend({
+export const DecodedToken_Schema = TokenPayload_Schema.extend({
   iat: z.number(),
   exp: z.number(),
 });
@@ -32,13 +32,13 @@ export const isTokenValid = (token: string) => {
   return jwt.verify(token, env.JWT_SECRET);
 };
 
-export const decodeToken = (token: string): TokenPayload => {
+export const decodeToken = (token: string) => {
   const decoded = jwt.decode(token);
   if (!decoded) {
     throw new BadRequestError('Invalid token');
   }
 
-  return Token_Schema.parse(decoded);
+  return DecodedToken_Schema.parse(decoded);
 };
 
 export const refreshToken = (token: string) => {
