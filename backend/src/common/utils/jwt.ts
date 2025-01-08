@@ -50,6 +50,15 @@ export const refreshToken = (token: string) => {
   }
 };
 
+const setTokenCookie = (res: Response, expiresIn: number, token?: string) => {
+  res.cookie('token', token ?? '', {
+    httpOnly: true,
+    expires: new Date(Date.now() + expiresIn),
+    secure: env.NODE_ENV === 'production',
+    signed: true,
+  });
+};
+
 export const attachCookiesToResponse = (
   res: Response,
   payload: TokenPayload
@@ -57,14 +66,9 @@ export const attachCookiesToResponse = (
   const token = createToken(payload);
   const oneDay = 24 * 60 * 60 * 1000;
 
-  res.cookie('token', token, {
-    httpOnly: true,
-    expires: new Date(Date.now() + oneDay),
-    secure: env.NODE_ENV === 'production',
-    signed: true,
-  });
+  setTokenCookie(res, oneDay, token);
 };
 
 export const clearCookies = (res: Response) => {
-  res.clearCookie('token');
+  setTokenCookie(res, 0);
 };
