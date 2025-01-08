@@ -24,7 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors({ origin: env.CORS_ORIGIN, credentials: true }));
 app.use(helmet());
 app.use(rateLimiter);
-app.use(cookieParser());
+app.use(cookieParser(env.JWT_SECRET));
 
 // Request logging
 app.use(requestLogger);

@@ -6,7 +6,7 @@ export const authenticate = (
   res: Response,
   next: NextFunction
 ): void => {
-  const token = req.cookies.token;
+  const token = req.signedCookies['token'];
 
   if (!token) {
     res.status(401).json({ message: 'Authentication token missing' });
