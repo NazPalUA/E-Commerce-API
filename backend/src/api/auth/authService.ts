@@ -24,10 +24,9 @@ class AuthService {
   private userRepo = userRepo;
 
   public async register(
-    userData: Register_ReqBody,
+    { password, ...rest }: Register_ReqBody,
     res: Response
   ): Promise<ServiceResponse<Register_ResObj>> {
-    const { password, ...rest } = userData;
     const hashedPassword = await bcrypt.hash(password, 10);
     const isFirstUser = (await this.userRepo.countDocuments()) === 0;
 
@@ -55,19 +54,14 @@ class AuthService {
   }
 
   public async login(
-    credentials: Login_ReqBody,
+    { email, password }: Login_ReqBody,
     res: Response
   ): Promise<ServiceResponse<Login_ResObj>> {
-    const { email, password } = credentials;
     const user = await this.userRepo.findUserByEmail(email);
-    if (!user) {
-      throw new NotFoundError('User');
-    }
+    if (!user) throw new UnauthorizedError('Invalid credentials');
 
-    const passwordMatch = await bcrypt.compare(password, user.password);
-    if (!passwordMatch) {
-      throw new UnauthorizedError('Invalid credentials');
-    }
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    if (!isPasswordCorrect) throw new UnauthorizedError('Invalid credentials');
 
     const tokenUser: TokenPayload = {
       id: user._id.toString(),
