@@ -16,7 +16,7 @@ extendZodWithOpenApi(z);
 // });
 
 // Response Schema
-const SingleUser_Schema = User_DTO_Schema;
+const UserItem_Schema = User_DTO_Schema;
 
 export type GetUsers_ResBodyObj = z.infer<typeof GetUsers_ResBodyObj_Schema>;
-export const GetUsers_ResBodyObj_Schema = z.array(SingleUser_Schema);
+export const GetUsers_ResBodyObj_Schema = z.array(UserItem_Schema);

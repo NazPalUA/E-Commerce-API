@@ -6,7 +6,7 @@ import { toDTO } from '@/common/utils/toDTO';
 import type { Request, RequestHandler, Response } from 'express';
 import { GetUsers_ResBodyObj } from './model';
 
-export const getUsers: RequestHandler = async (
+export const getAllUsers: RequestHandler = async (
   _req: Request,
   res: Response
 ) => {
