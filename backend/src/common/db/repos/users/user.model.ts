@@ -19,3 +19,11 @@ export const User_DbEntity_Schema = z
     updatedAt: z.date().default(new Date()),
   })
   .strict();
+
+// User DTO Schema
+export type User_DTO = z.infer<typeof User_DTO_Schema>;
+export const User_DTO_Schema = User_DbEntity_Schema.omit({
+  _id: true,
+}).extend({
+  id: commonValidations.id,
+});

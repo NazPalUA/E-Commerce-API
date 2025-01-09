@@ -1,30 +1,18 @@
-import { createApiResponse } from '@/api-docs/openAPIResponseBuilders';
-import { GetUser_Req_Schema, User_DTO_Schema } from '@/api/user/userModel';
+import { User_DTO_Schema } from '@/common/db/repos/users/user.model';
 import { OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
 import { Router } from 'express';
-import { z } from 'zod';
-import { getUser, getUsers } from './userController';
+import { getUser } from './controllers/getUser/controller';
+import { getUserRouterConfig } from './controllers/getUser/docs-config';
+import { getUsers } from './controllers/getUsers/controller';
+import { getUsersRouterConfig } from './controllers/getUsers/docs-config';
 
 export const userRegistry = new OpenAPIRegistry();
 export const userRouter = Router();
 
 userRegistry.register('User', User_DTO_Schema);
 
-userRegistry.registerPath({
-  method: 'get',
-  path: '/api/v1/users',
-  tags: ['User'],
-  responses: createApiResponse(z.array(User_DTO_Schema), 'Success'),
-});
-
 userRouter.get('/', getUsers);
-
-userRegistry.registerPath({
-  method: 'get',
-  path: '/api/v1/users/{id}',
-  tags: ['User'],
-  request: { params: GetUser_Req_Schema.shape.params },
-  responses: createApiResponse(User_DTO_Schema, 'Success'),
-});
+userRegistry.registerPath(getUsersRouterConfig);
 
 userRouter.get('/:id', getUser);
+userRegistry.registerPath(getUserRouterConfig);
