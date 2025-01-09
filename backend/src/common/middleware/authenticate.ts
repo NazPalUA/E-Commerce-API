@@ -24,13 +24,14 @@ export const authenticate = (
   }
 };
 
-export const authenticateAdmin = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void => {
-  if (req.userRole !== 'admin') {
-    res.status(403).json({ message: 'Unauthorized' });
-    return;
-  }
-};
+type UserRole = 'admin' | 'user';
+
+export const authorize =
+  (role: UserRole) =>
+  (req: Request, res: Response, next: NextFunction): void => {
+    if (req.userRole !== role) {
+      res.status(403).json({ message: 'Unauthorized' });
+      return;
+    }
+    next();
+  };

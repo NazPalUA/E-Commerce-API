@@ -1,4 +1,5 @@
 import { User_DTO_Schema } from '@/common/db/repos/users/user.model';
+import { authenticate, authorize } from '@/common/middleware/authenticate';
 import { OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
 import { Router } from 'express';
 import { getUser } from './controllers/getUser/controller';
@@ -11,8 +12,8 @@ export const userRouter = Router();
 
 userRegistry.register('User', User_DTO_Schema);
 
-userRouter.get('/', getUsers);
+userRouter.get('/', authenticate, authorize('admin'), getUsers);
 userRegistry.registerPath(getUsersRouterConfig);
 
-userRouter.get('/:id', getUser);
+userRouter.get('/:id', authenticate, authorize('admin'), getUser);
 userRegistry.registerPath(getUserRouterConfig);
