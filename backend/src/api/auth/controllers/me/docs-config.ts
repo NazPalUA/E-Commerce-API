@@ -4,7 +4,7 @@ import { Me_ResBodyObj_Schema } from './model';
 
 export const meRouterConfig: RouteConfig = {
   method: 'get',
-  path: '/me',
+  path: '/api/v1/auth/me',
   tags: ['Auth'],
   responses: createApiResponse(Me_ResBodyObj_Schema, 'Success'),
 };

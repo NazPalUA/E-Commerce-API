@@ -4,7 +4,7 @@ import { Register_Req_Schema, Register_ResBodyObj_Schema } from './model';
 
 export const registerRouterConfig: RouteConfig = {
   method: 'post',
-  path: '/register',
+  path: '/api/v1/auth/register',
   tags: ['Auth'],
   request: {
     body: {

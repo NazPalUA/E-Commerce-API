@@ -4,7 +4,7 @@ import { Login_Req_Schema, Login_ResBodyObj_Schema } from './model';
 
 export const loginRouterConfig: RouteConfig = {
   method: 'post',
-  path: '/login',
+  path: '/api/v1/auth/login',
   tags: ['Auth'],
   request: {
     body: {
