@@ -6,6 +6,10 @@ import {
   handleServiceResponse,
   validateReq,
 } from '@/common/utils/httpHandlers';
+import {
+  attachCookiesToResponse,
+  getTokenPayloadFromUser,
+} from '@/common/utils/jwt';
 import { toDTO } from '@/common/utils/toDTO';
 import type { Request, RequestHandler, Response } from 'express';
 import { ObjectId } from 'mongodb';
@@ -29,6 +33,9 @@ export const updateUser: RequestHandler = async (
   if (!user) {
     throw new NotFoundError('User');
   }
+
+  const tokenUser = getTokenPayloadFromUser(user);
+  attachCookiesToResponse(res, tokenUser);
 
   const serviceResponse = ServiceResponse.success<UpdateUser_ResBodyObj>(
     'User found',
