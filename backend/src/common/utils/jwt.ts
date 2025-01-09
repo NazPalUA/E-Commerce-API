@@ -1,10 +1,14 @@
 import { Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { z } from 'zod';
-import { User_DbEntity_Schema } from '../db/repos/users/user.model';
+import {
+  User_DbEntity,
+  User_DbEntity_Schema,
+} from '../db/repos/users/user.model';
 import { BadRequestError } from '../errors/bad-request-error';
 import { commonValidations } from './commonValidation';
 import { env } from './envConfig';
+import { toDTO } from './toDTO';
 
 export type TokenPayload = z.infer<typeof TokenPayload_Schema>;
 export const TokenPayload_Schema = User_DbEntity_Schema.pick({
@@ -71,4 +75,9 @@ export const attachCookiesToResponse = (
 
 export const clearCookies = (res: Response) => {
   setTokenCookie(res, 0);
+};
+
+export const getTokenPayloadFromUser = (user: User_DbEntity) => {
+  const { id, name, email, role } = toDTO(user);
+  return { id, name, email, role };
 };

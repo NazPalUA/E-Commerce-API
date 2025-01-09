@@ -5,7 +5,10 @@ import {
   handleServiceResponse,
   validateReq,
 } from '@/common/utils/httpHandlers';
-import { attachCookiesToResponse, TokenPayload } from '@/common/utils/jwt';
+import {
+  attachCookiesToResponse,
+  getTokenPayloadFromUser,
+} from '@/common/utils/jwt';
 import bcrypt from 'bcrypt';
 import { Request, RequestHandler, Response } from 'express';
 import { Register_Req_Schema, Register_ResBodyObj } from './model';
@@ -25,12 +28,7 @@ export const register: RequestHandler = async (req: Request, res: Response) => {
 
   const insertedUser = await userRepo.insertUser(newUser);
 
-  const tokenUser: TokenPayload = {
-    id: insertedUser._id.toString(),
-    name: insertedUser.name,
-    email: insertedUser.email,
-    role: insertedUser.role,
-  };
+  const tokenUser = getTokenPayloadFromUser(insertedUser);
 
   attachCookiesToResponse(res, tokenUser);
 

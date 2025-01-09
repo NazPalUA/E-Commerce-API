@@ -5,7 +5,10 @@ import {
   handleServiceResponse,
   validateReq,
 } from '@/common/utils/httpHandlers';
-import { attachCookiesToResponse, TokenPayload } from '@/common/utils/jwt';
+import {
+  attachCookiesToResponse,
+  getTokenPayloadFromUser,
+} from '@/common/utils/jwt';
 import bcrypt from 'bcrypt';
 import { Request, RequestHandler, Response } from 'express';
 import { Login_Req_Schema, Login_ResBodyObj } from './model';
@@ -20,12 +23,7 @@ export const login: RequestHandler = async (req: Request, res: Response) => {
   const isPasswordCorrect = await bcrypt.compare(password, user.password);
   if (!isPasswordCorrect) throw new UnauthorizedError('Invalid credentials');
 
-  const tokenUser: TokenPayload = {
-    id: user._id.toString(),
-    name: user.name,
-    email: user.email,
-    role: user.role,
-  };
+  const tokenUser = getTokenPayloadFromUser(user);
 
   attachCookiesToResponse(res, tokenUser);
 
