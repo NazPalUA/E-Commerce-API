@@ -6,6 +6,8 @@ import { getAllUsers } from './controllers/getAllUsers/controller';
 import { getUsersRouterConfig } from './controllers/getAllUsers/docs-config';
 import { getSingleUser } from './controllers/getSingleUser/controller';
 import { getUserRouterConfig } from './controllers/getSingleUser/docs-config';
+import { updateUser } from './controllers/updateUser/controller';
+import { updateUserRouterConfig } from './controllers/updateUser/docs-config';
 
 export const userRegistry = new OpenAPIRegistry();
 export const userRouter = Router();
@@ -17,3 +19,6 @@ userRegistry.registerPath(getUsersRouterConfig);
 
 userRouter.get('/:id', authenticate, authorize('admin'), getSingleUser);
 userRegistry.registerPath(getUserRouterConfig);
+
+userRouter.patch('/:id', authenticate, authorize('admin'), updateUser);
+userRegistry.registerPath(updateUserRouterConfig);

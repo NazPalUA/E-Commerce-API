@@ -16,6 +16,19 @@ export class UserRepository {
     return { ...candidate, _id: result.insertedId };
   }
 
+  public async updateUser(
+    userId: ObjectId,
+    userData: Partial<User_DbEntity>
+  ): Promise<User_DbEntity | null> {
+    const updatedUser = await this.collection.findOneAndUpdate(
+      { _id: userId },
+      { $set: userData },
+      { returnDocument: 'after' }
+    );
+
+    return updatedUser;
+  }
+
   public async findAllUsers(): Promise<User_DbEntity[]> {
     return this.collection.find().toArray();
   }
