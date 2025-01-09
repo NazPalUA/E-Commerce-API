@@ -11,13 +11,8 @@ extendZodWithOpenApi(z);
 export type UpdateUserInfo_Req = z.infer<typeof UpdateUserInfo_Req_Schema>;
 export const UpdateUserInfo_Req_Schema = z.object({
   params: z.object({ id: commonValidations.id }),
-  body: User_DTO_Schema.omit({
-    id: true,
-    createdAt: true,
-    updatedAt: true,
-    role: true,
-    email: true,
-    password: true,
+  body: User_DTO_Schema.pick({
+    name: true,
   }).partial(),
 });
 
