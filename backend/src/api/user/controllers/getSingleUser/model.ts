@@ -8,11 +8,13 @@ import { z } from 'zod';
 extendZodWithOpenApi(z);
 
 // Request Schema
-export type GetUser_Req = z.infer<typeof GetUser_Req_Schema>;
-export const GetUser_Req_Schema = z.object({
+export type GetSingleUser_Req = z.infer<typeof GetSingleUser_Req_Schema>;
+export const GetSingleUser_Req_Schema = z.object({
   params: z.object({ id: commonValidations.id }),
 });
 
 // Response Schema
-export type GetUser_ResBodyObj = z.infer<typeof GetUser_ResBodyObj_Schema>;
-export const GetUser_ResBodyObj_Schema = User_DTO_Schema;
+export type GetSingleUser_ResBodyObj = z.infer<
+  typeof GetSingleUser_ResBodyObj_Schema
+>;
+export const GetSingleUser_ResBodyObj_Schema = User_DTO_Schema;

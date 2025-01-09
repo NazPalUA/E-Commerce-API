@@ -4,8 +4,8 @@ import { OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
 import { Router } from 'express';
 import { getAllUsers } from './controllers/getAllUsers/controller';
 import { getUsersRouterConfig } from './controllers/getAllUsers/docs-config';
-import { getUser } from './controllers/getUser/controller';
-import { getUserRouterConfig } from './controllers/getUser/docs-config';
+import { getSingleUser } from './controllers/getSingleUser/controller';
+import { getUserRouterConfig } from './controllers/getSingleUser/docs-config';
 
 export const userRegistry = new OpenAPIRegistry();
 export const userRouter = Router();
@@ -15,5 +15,5 @@ userRegistry.register('User', User_DTO_Schema);
 userRouter.get('/', authenticate, authorize('admin'), getAllUsers);
 userRegistry.registerPath(getUsersRouterConfig);
 
-userRouter.get('/:id', authenticate, authorize('admin'), getUser);
+userRouter.get('/:id', authenticate, authorize('admin'), getSingleUser);
 userRegistry.registerPath(getUserRouterConfig);
