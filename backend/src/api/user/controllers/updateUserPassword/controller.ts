@@ -42,12 +42,12 @@ export const updateUserPassword: RequestHandler = async (
   );
   if (!isPasswordCorrect) throw new UnauthorizedError('Incorrect password');
 
-  const newHashedPassword = await bcrypt.hash(newPassword, 10);
-
-  const isTheSamePassword = newHashedPassword === user.password;
+  const isTheSamePassword = await bcrypt.compare(newPassword, user.password);
   if (isTheSamePassword) {
     throw new BadRequestError('New password is the same as the old password');
   }
+
+  const newHashedPassword = await bcrypt.hash(newPassword, 10);
 
   await userRepo.updateUser(new ObjectId(params.id), {
     password: newHashedPassword,
