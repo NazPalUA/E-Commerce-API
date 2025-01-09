@@ -7,8 +7,8 @@ import { z } from 'zod';
 extendZodWithOpenApi(z);
 
 // Request Schema
-// export type GetUsers_Req = z.infer<typeof GetUsers_Req_Schema>;
-// export const GetUsers_Req_Schema = z.object({
+// export type GetAllUsers_Req = z.infer<typeof GetAllUsers_Req_Schema>;
+// export const GetAllUsers_Req_Schema = z.object({
 //   query: z.object({
 //     page: z.string().optional(),
 //     limit: z.string().optional(),
@@ -18,5 +18,7 @@ extendZodWithOpenApi(z);
 // Response Schema
 const UserItem_Schema = User_DTO_Schema;
 
-export type GetUsers_ResBodyObj = z.infer<typeof GetUsers_ResBodyObj_Schema>;
-export const GetUsers_ResBodyObj_Schema = z.array(UserItem_Schema);
+export type GetAllUsers_ResBodyObj = z.infer<
+  typeof GetAllUsers_ResBodyObj_Schema
+>;
+export const GetAllUsers_ResBodyObj_Schema = z.array(UserItem_Schema);
