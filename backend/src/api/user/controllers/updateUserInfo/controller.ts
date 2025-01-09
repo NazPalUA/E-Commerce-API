@@ -13,13 +13,16 @@ import {
 import { toDTO } from '@/common/utils/toDTO';
 import type { Request, RequestHandler, Response } from 'express';
 import { ObjectId } from 'mongodb';
-import { UpdateUser_Req_Schema, UpdateUser_ResBodyObj } from './model';
+import { UpdateUserInfo_Req_Schema, UpdateUserInfo_ResBodyObj } from './model';
 
-export const updateUser: RequestHandler = async (
+export const updateUserInfo: RequestHandler = async (
   req: Request,
   res: Response
 ) => {
-  const { params, body: userData } = validateReq(req, UpdateUser_Req_Schema);
+  const { params, body: userData } = validateReq(
+    req,
+    UpdateUserInfo_Req_Schema
+  );
 
   const hasAccess = params.id === req.userId;
   if (!hasAccess) {
@@ -37,7 +40,7 @@ export const updateUser: RequestHandler = async (
   const tokenUser = getTokenPayloadFromUser(user);
   attachCookiesToResponse(res, tokenUser);
 
-  const serviceResponse = ServiceResponse.success<UpdateUser_ResBodyObj>(
+  const serviceResponse = ServiceResponse.success<UpdateUserInfo_ResBodyObj>(
     'User found',
     toDTO(user)
   );

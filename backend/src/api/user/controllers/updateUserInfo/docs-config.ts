@@ -1,20 +1,23 @@
 import { createApiResponse } from '@/api-docs/openAPIResponseBuilders';
 import { RouteConfig } from '@asteasolutions/zod-to-openapi';
-import { UpdateUser_Req_Schema, UpdateUser_ResBodyObj_Schema } from './model';
+import {
+  UpdateUserInfo_Req_Schema,
+  UpdateUserInfo_ResBodyObj_Schema,
+} from './model';
 
 export const updateUserRouterConfig: RouteConfig = {
   method: 'patch',
   path: '/api/v1/users/{id}',
   tags: ['User'],
   request: {
-    params: UpdateUser_Req_Schema.shape.params,
+    params: UpdateUserInfo_Req_Schema.shape.params,
     body: {
       content: {
         'application/json': {
-          schema: UpdateUser_Req_Schema.shape.body,
+          schema: UpdateUserInfo_Req_Schema.shape.body,
         },
       },
     },
   },
-  responses: createApiResponse(UpdateUser_ResBodyObj_Schema, 'Success'),
+  responses: createApiResponse(UpdateUserInfo_ResBodyObj_Schema, 'Success'),
 };

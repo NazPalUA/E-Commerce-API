@@ -8,8 +8,8 @@ import { z } from 'zod';
 extendZodWithOpenApi(z);
 
 // Request Schema
-export type UpdateUser_Req = z.infer<typeof UpdateUser_Req_Schema>;
-export const UpdateUser_Req_Schema = z.object({
+export type UpdateUserInfo_Req = z.infer<typeof UpdateUserInfo_Req_Schema>;
+export const UpdateUserInfo_Req_Schema = z.object({
   params: z.object({ id: commonValidations.id }),
   body: User_DTO_Schema.omit({
     id: true,
@@ -22,7 +22,7 @@ export const UpdateUser_Req_Schema = z.object({
 });
 
 // Response Schema
-export type UpdateUser_ResBodyObj = z.infer<
-  typeof UpdateUser_ResBodyObj_Schema
+export type UpdateUserInfo_ResBodyObj = z.infer<
+  typeof UpdateUserInfo_ResBodyObj_Schema
 >;
-export const UpdateUser_ResBodyObj_Schema = User_DTO_Schema;
+export const UpdateUserInfo_ResBodyObj_Schema = User_DTO_Schema;

@@ -6,8 +6,8 @@ import { getAllUsers } from './controllers/getAllUsers/controller';
 import { getUsersRouterConfig } from './controllers/getAllUsers/docs-config';
 import { getSingleUser } from './controllers/getSingleUser/controller';
 import { getUserRouterConfig } from './controllers/getSingleUser/docs-config';
-import { updateUser } from './controllers/updateUser/controller';
-import { updateUserRouterConfig } from './controllers/updateUser/docs-config';
+import { updateUserInfo } from './controllers/updateUserInfo/controller';
+import { updateUserRouterConfig } from './controllers/updateUserInfo/docs-config';
 import { updateUserPassword } from './controllers/updateUserPassword/controller';
 import { updateUserPasswordRouterConfig } from './controllers/updateUserPassword/docs-config';
 
@@ -22,7 +22,7 @@ userRegistry.registerPath(getUsersRouterConfig);
 userRouter.get('/:id', authenticate, getSingleUser);
 userRegistry.registerPath(getUserRouterConfig);
 
-userRouter.patch('/:id', authenticate, updateUser);
+userRouter.patch('/:id', authenticate, updateUserInfo);
 userRegistry.registerPath(updateUserRouterConfig);
 
 userRouter.patch('/:id/password', authenticate, updateUserPassword);
