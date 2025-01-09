@@ -16,7 +16,7 @@ export class UserRepository {
     return { ...candidate, _id: result.insertedId };
   }
 
-  public async updateUser(
+  public async findUserAndUpdate(
     userId: ObjectId,
     userData: Partial<User_DbEntity>
   ): Promise<User_DbEntity | null> {

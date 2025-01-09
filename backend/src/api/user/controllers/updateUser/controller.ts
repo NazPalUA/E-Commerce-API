@@ -22,7 +22,10 @@ export const updateUser: RequestHandler = async (
     throw new ForbiddenError('You are not allowed to update this user');
   }
 
-  const user = await userRepo.updateUser(new ObjectId(params.id), userData);
+  const user = await userRepo.findUserAndUpdate(
+    new ObjectId(params.id),
+    userData
+  );
   if (!user) {
     throw new NotFoundError('User');
   }
