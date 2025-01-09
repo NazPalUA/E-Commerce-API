@@ -12,7 +12,7 @@ userRegistry.register('User', User_DTO_Schema);
 
 userRegistry.registerPath({
   method: 'get',
-  path: '/users',
+  path: '/api/v1/users',
   tags: ['User'],
   responses: createApiResponse(z.array(User_DTO_Schema), 'Success'),
 });
@@ -21,7 +21,7 @@ userRouter.get('/', getUsers);
 
 userRegistry.registerPath({
   method: 'get',
-  path: '/users/{id}',
+  path: '/api/v1/users/{id}',
   tags: ['User'],
   request: { params: GetUser_Req_Schema.shape.params },
   responses: createApiResponse(User_DTO_Schema, 'Success'),
