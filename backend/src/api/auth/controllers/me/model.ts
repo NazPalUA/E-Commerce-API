@@ -7,9 +7,6 @@ import { z } from 'zod';
 extendZodWithOpenApi(z);
 
 // Request Schema
-export const Me_Req_Schema = z.object({
-  body: z.null(),
-});
 
 // Response Schema
 export type Me_ResBodyObj = z.infer<typeof Me_ResBodyObj_Schema>;
