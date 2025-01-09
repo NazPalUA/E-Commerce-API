@@ -29,6 +29,17 @@ export class UserRepository {
     return updatedUser;
   }
 
+  public async updateUser(
+    userId: ObjectId,
+    userData: Partial<User_DbEntity>
+  ): Promise<boolean> {
+    const result = await this.collection.updateOne(
+      { _id: userId },
+      { $set: userData }
+    );
+    return result.modifiedCount > 0 ? true : false;
+  }
+
   public async findAllUsers(): Promise<User_DbEntity[]> {
     return this.collection.find().toArray();
   }
