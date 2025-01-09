@@ -1,4 +1,5 @@
 import { userRepo } from '@/common/db/repos/users/user.repo';
+import { ForbiddenError } from '@/common/errors/forbidden-error';
 import { NotFoundError } from '@/common/errors/not-found-error';
 import { ServiceResponse } from '@/common/models/serviceResponse';
 import {
@@ -15,6 +16,11 @@ export const getSingleUser: RequestHandler = async (
   res: Response
 ) => {
   const { params } = validateReq(req, GetSingleUser_Req_Schema);
+
+  const hasAccess = params.id === req.userId;
+  if (!hasAccess) {
+    throw new ForbiddenError('You are not allowed to access this user');
+  }
 
   const user = await userRepo.findUserById(new ObjectId(params.id));
   if (!user) {

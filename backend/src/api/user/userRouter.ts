@@ -17,8 +17,8 @@ userRegistry.register('User', User_DTO_Schema);
 userRouter.get('/', authenticate, authorize('admin'), getAllUsers);
 userRegistry.registerPath(getUsersRouterConfig);
 
-userRouter.get('/:id', authenticate, authorize('admin'), getSingleUser);
+userRouter.get('/:id', authenticate, getSingleUser);
 userRegistry.registerPath(getUserRouterConfig);
 
-userRouter.patch('/:id', authenticate, authorize('admin'), updateUser);
+userRouter.patch('/:id', authenticate, updateUser);
 userRegistry.registerPath(updateUserRouterConfig);
