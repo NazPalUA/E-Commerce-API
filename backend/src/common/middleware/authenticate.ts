@@ -24,13 +24,17 @@ export const authenticate = (
   }
 };
 
-type UserRole = 'admin' | 'user';
+export type UserRole = 'admin' | 'user';
 
-export const authorize =
-  (role: UserRole) =>
-  (req: Request, res: Response, next: NextFunction): void => {
-    if (req.userRole !== role) {
+export const authorize = (...roles: UserRole[]) => {
+  return (req: Request, res: Response, next: NextFunction): void => {
+    if (!req.userRole) {
+      throw new UnauthorizedError('User role not found');
+    }
+
+    if (!roles.includes(req.userRole as UserRole)) {
       throw new ForbiddenError('Unauthorized');
     }
     next();
   };
+};
