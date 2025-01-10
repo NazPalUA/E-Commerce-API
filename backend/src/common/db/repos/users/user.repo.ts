@@ -1,55 +1,109 @@
+import { BadRequestError } from '@/common/errors/bad-request-error';
+import { NotFoundError } from '@/common/errors/not-found-error';
+import { UnauthorizedError } from '@/common/errors/unauthorized-error';
+import bcrypt from 'bcrypt';
 import { Collection, ObjectId } from 'mongodb';
 import { collections } from '../..';
-import { NewUser, User_DbEntity, User_DbEntity_Schema } from './user.model';
+import {
+  getUserDTO,
+  NewUser,
+  User_DbEntity,
+  User_DbEntity_Schema,
+  User_DTO,
+} from './user.model';
 
 export class UserRepository {
   private get collection(): Collection<User_DbEntity> {
     return collections.users;
   }
 
-  public async insertUser(user: NewUser): Promise<User_DbEntity> {
+  public async checkPassword(
+    userId: string,
+    candidatePassword: string
+  ): Promise<boolean> {
+    const user = (await this.collection.findOne(
+      { _id: new ObjectId(userId) },
+      { projection: { password: 1 } }
+    )) as Pick<User_DbEntity, 'password'>;
+    return user
+      ? await bcrypt.compare(candidatePassword, user.password)
+      : false;
+  }
+
+  public async insertUser(user: NewUser): Promise<User_DTO> {
+    const isFirstUser = (await this.countDocuments()) === 0;
+
     const candidate = User_DbEntity_Schema.parse({
       ...user,
       _id: new ObjectId(),
+      role: isFirstUser ? 'admin' : 'user',
     });
     const result = await this.collection.insertOne(candidate);
-    return { ...candidate, _id: result.insertedId };
-  }
-
-  public async findUserAndUpdate(
-    userId: ObjectId,
-    userData: Partial<User_DbEntity>
-  ): Promise<User_DbEntity | null> {
-    const updatedUser = await this.collection.findOneAndUpdate(
-      { _id: userId },
-      { $set: userData },
-      { returnDocument: 'after' }
-    );
-
-    return updatedUser;
+    const userDTO = getUserDTO({
+      ...candidate,
+      _id: result.insertedId,
+    });
+    return userDTO;
   }
 
   public async updateUser(
-    userId: ObjectId,
-    userData: Partial<User_DbEntity>
-  ): Promise<boolean> {
-    const result = await this.collection.updateOne(
-      { _id: userId },
-      { $set: userData }
+    userId: string,
+    userData: Partial<Pick<User_DTO, 'name' | 'email'>>
+  ): Promise<User_DTO | null> {
+    const updatedUser = await this.collection.findOneAndUpdate(
+      { _id: new ObjectId(userId) },
+      { $set: { ...userData, updatedAt: new Date() } },
+      { returnDocument: 'after' }
     );
-    return result.modifiedCount > 0 ? true : false;
+
+    return updatedUser ? getUserDTO(updatedUser) : null;
   }
 
-  public async findAllUsers(): Promise<User_DbEntity[]> {
-    return this.collection.find().toArray();
+  public async updatePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string
+  ): Promise<void> {
+    const user = await this.collection.findOne({ _id: new ObjectId(userId) });
+    if (!user) throw new NotFoundError('User');
+
+    const isPasswordCorrect = await this.checkPassword(userId, currentPassword);
+    if (!isPasswordCorrect) throw new UnauthorizedError('Incorrect password');
+
+    const isTheSamePassword = await this.checkPassword(userId, newPassword);
+    if (isTheSamePassword)
+      throw new BadRequestError('New password is the same as the old password');
+
+    const newHashedPassword =
+      User_DbEntity_Schema.shape.password.parse(newPassword);
+
+    const result = await this.collection.updateOne(
+      { _id: new ObjectId(userId) },
+      { $set: { password: newHashedPassword, updatedAt: new Date() } }
+    );
+    if (result.modifiedCount === 0)
+      throw new Error('Failed to update password');
   }
 
-  public async findUserById(userId: ObjectId): Promise<User_DbEntity | null> {
-    return this.collection.findOne({ _id: userId });
+  public async findAllUsers(): Promise<User_DTO[]> {
+    return this.collection
+      .find()
+      .toArray()
+      .then(users => {
+        return users.map(user => getUserDTO(user));
+      });
   }
 
-  public async findUserByEmail(email: string): Promise<User_DbEntity | null> {
-    return this.collection.findOne({ email });
+  public async findUserById(userId: string): Promise<User_DTO | null> {
+    return this.collection.findOne({ _id: new ObjectId(userId) }).then(user => {
+      return user ? getUserDTO(user) : null;
+    });
+  }
+
+  public async findUserByEmail(email: string): Promise<User_DTO | null> {
+    return this.collection.findOne({ email }).then(user => {
+      return user ? getUserDTO(user) : null;
+    });
   }
 
   public async countDocuments(): Promise<number> {

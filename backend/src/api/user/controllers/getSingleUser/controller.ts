@@ -6,9 +6,7 @@ import {
   handleServiceResponse,
   validateReq,
 } from '@/common/utils/httpHandlers';
-import { toDTO } from '@/common/utils/toDTO';
 import type { Request, RequestHandler, Response } from 'express';
-import { ObjectId } from 'mongodb';
 import { GetSingleUser_Req_Schema, GetSingleUser_ResBodyObj } from './model';
 
 export const getSingleUser: RequestHandler = async (
@@ -22,14 +20,14 @@ export const getSingleUser: RequestHandler = async (
     throw new ForbiddenError('You are not allowed to access this user');
   }
 
-  const user = await userRepo.findUserById(new ObjectId(params.id));
+  const user = await userRepo.findUserById(params.id);
   if (!user) {
     throw new NotFoundError('User');
   }
 
   const serviceResponse = ServiceResponse.success<GetSingleUser_ResBodyObj>(
     'User found',
-    toDTO(user)
+    user
   );
   handleServiceResponse(serviceResponse, res);
 };

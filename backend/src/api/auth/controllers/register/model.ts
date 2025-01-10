@@ -1,3 +1,5 @@
+import { User_DTO_Schema } from '@/common/db/repos/users/user.model';
+import { commonValidations } from '@/common/utils/commonValidation';
 import { TokenPayload_Schema } from '@/common/utils/jwt';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import { z } from 'zod';
@@ -9,9 +11,9 @@ extendZodWithOpenApi(z);
 // Request Schema
 export type Register_ReqBody = z.infer<typeof Register_ReqBody_Schema>;
 export const Register_ReqBody_Schema = z.object({
-  name: z.string().min(3).max(50),
-  email: z.string().email(),
-  password: z.string().min(8).max(50),
+  name: User_DTO_Schema.shape.name,
+  email: User_DTO_Schema.shape.email,
+  password: commonValidations.password,
 });
 
 export const Register_Req_Schema = z.object({

@@ -10,9 +10,7 @@ import {
   attachCookiesToResponse,
   getTokenPayloadFromUser,
 } from '@/common/utils/jwt';
-import { toDTO } from '@/common/utils/toDTO';
 import type { Request, RequestHandler, Response } from 'express';
-import { ObjectId } from 'mongodb';
 import { UpdateUserInfo_Req_Schema, UpdateUserInfo_ResBodyObj } from './model';
 
 export const updateUserInfo: RequestHandler = async (
@@ -29,10 +27,7 @@ export const updateUserInfo: RequestHandler = async (
     throw new ForbiddenError('You are not allowed to update this user');
   }
 
-  const user = await userRepo.findUserAndUpdate(
-    new ObjectId(params.id),
-    userData
-  );
+  const user = await userRepo.updateUser(params.id, userData);
   if (!user) {
     throw new NotFoundError('User');
   }
@@ -42,7 +37,7 @@ export const updateUserInfo: RequestHandler = async (
 
   const serviceResponse = ServiceResponse.success<UpdateUserInfo_ResBodyObj>(
     'User found',
-    toDTO(user)
+    user
   );
   handleServiceResponse(serviceResponse, res);
 };

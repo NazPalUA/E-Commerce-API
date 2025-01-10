@@ -1,3 +1,4 @@
+import { commonValidations } from '@/common/utils/commonValidation';
 import { TokenPayload_Schema } from '@/common/utils/jwt';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import { z } from 'zod';
@@ -10,7 +11,7 @@ extendZodWithOpenApi(z);
 export type Login_ReqBody = z.infer<typeof Login_ReqBody_Schema>;
 export const Login_ReqBody_Schema = z.object({
   email: z.string().email(),
-  password: z.string().min(8).max(50),
+  password: commonValidations.password,
 });
 
 export const Login_Req_Schema = z.object({

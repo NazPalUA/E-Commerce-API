@@ -9,7 +9,6 @@ import {
   attachCookiesToResponse,
   getTokenPayloadFromUser,
 } from '@/common/utils/jwt';
-import bcrypt from 'bcrypt';
 import { Request, RequestHandler, Response } from 'express';
 import { Login_Req_Schema, Login_ResBodyObj } from './model';
 
@@ -20,7 +19,7 @@ export const login: RequestHandler = async (req: Request, res: Response) => {
   const user = await userRepo.findUserByEmail(email);
   if (!user) throw new UnauthorizedError('Invalid credentials');
 
-  const isPasswordCorrect = await bcrypt.compare(password, user.password);
+  const isPasswordCorrect = await userRepo.checkPassword(user.id, password);
   if (!isPasswordCorrect) throw new UnauthorizedError('Invalid credentials');
 
   const tokenUser = getTokenPayloadFromUser(user);
