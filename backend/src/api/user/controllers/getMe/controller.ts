@@ -1,8 +1,8 @@
-import { userRepo } from '@/common/db/repos/users/user.repo';
-import { NotFoundError } from '@/common/errors/not-found-error';
-import { UnauthorizedError } from '@/common/errors/unauthorized-error';
-import { ServiceResponse } from '@/common/models/serviceResponse';
-import { handleServiceResponse } from '@/common/utils/httpHandlers';
+import { userRepo } from '@/db/repos/users/user.repo';
+import { NotFoundError } from '@/errors/not-found-error';
+import { UnauthorizedError } from '@/errors/unauthorized-error';
+import { ServiceResponse } from '@/models/serviceResponse';
+import { handleServiceResponse } from '@/utils/httpHandlers';
 import type { Request, RequestHandler, Response } from 'express';
 import { GetMe_ResBodyObj } from './model';
 

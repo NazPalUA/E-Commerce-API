@@ -1,4 +1,4 @@
-import { authenticate } from '@/common/middleware/authenticate';
+import { authenticate } from '@/middleware/authenticate';
 import { OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
 import { Router } from 'express';
 import { login } from './controllers/login/controller';

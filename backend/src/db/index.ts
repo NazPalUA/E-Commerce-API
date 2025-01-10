@@ -1,4 +1,4 @@
-import { env } from '@/common/utils/envConfig';
+import { env } from '@/utils/envConfig';
 import { Collection, Db, MongoClient } from 'mongodb';
 import { pino } from 'pino';
 import { User_DbEntity } from './repos/users/user.model';

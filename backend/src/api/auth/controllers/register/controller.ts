@@ -1,13 +1,13 @@
-import { userRepo } from '@/common/db/repos/users/user.repo';
-import { ServiceResponse } from '@/common/models/serviceResponse';
+import { userRepo } from '@/db/repos/users/user.repo';
+import { ServiceResponse } from '@/models/serviceResponse';
 import {
   handleServiceResponse,
   validateReq,
-} from '@/common/utils/httpHandlers';
+} from '@/utils/httpHandlers';
 import {
   attachCookiesToResponse,
   getTokenPayloadFromUser,
-} from '@/common/utils/jwt';
+} from '@/utils/jwt';
 import { Request, RequestHandler, Response } from 'express';
 import { Register_Req_Schema, Register_ResBodyObj } from './model';
 

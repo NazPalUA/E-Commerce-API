@@ -1,6 +1,6 @@
-import { User_DTO_Schema } from '@/common/db/repos/users/user.model';
-import { commonValidations } from '@/common/utils/commonValidation';
-import { TokenPayload_Schema } from '@/common/utils/jwt';
+import { User_DTO_Schema } from '@/db/repos/users/user.model';
+import { commonValidations } from '@/utils/commonValidation';
+import { TokenPayload_Schema } from '@/utils/jwt';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import { z } from 'zod';
 

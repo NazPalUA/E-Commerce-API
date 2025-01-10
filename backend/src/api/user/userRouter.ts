@@ -1,5 +1,5 @@
-import { User_DTO_Schema } from '@/common/db/repos/users/user.model';
-import { authenticate, authorize } from '@/common/middleware/authenticate';
+import { User_DTO_Schema } from '@/db/repos/users/user.model';
+import { authenticate, authorize } from '@/middleware/authenticate';
 import { OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
 import { Router } from 'express';
 import { getAllUsers } from './controllers/getAllUsers/controller';

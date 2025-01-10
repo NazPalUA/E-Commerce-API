@@ -1,4 +1,4 @@
-import { User_DTO_Schema } from '@/common/db/repos/users/user.model';
+import { User_DTO_Schema } from '@/db/repos/users/user.model';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import { z } from 'zod';
 

@@ -1,4 +1,4 @@
-import { TokenPayload_Schema } from '@/common/utils/jwt';
+import { TokenPayload_Schema } from '@/utils/jwt';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import { z } from 'zod';
 

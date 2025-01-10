@@ -1,6 +1,6 @@
-import { BadRequestError } from '@/common/errors/bad-request-error';
-import { NotFoundError } from '@/common/errors/not-found-error';
-import { UnauthorizedError } from '@/common/errors/unauthorized-error';
+import { BadRequestError } from '@/errors/bad-request-error';
+import { NotFoundError } from '@/errors/not-found-error';
+import { UnauthorizedError } from '@/errors/unauthorized-error';
 import bcrypt from 'bcrypt';
 import { Collection, ObjectId } from 'mongodb';
 import { collections } from '../..';

@@ -1,7 +1,7 @@
-import { UnauthorizedError } from '@/common/errors/unauthorized-error';
-import { ServiceResponse } from '@/common/models/serviceResponse';
-import { handleServiceResponse } from '@/common/utils/httpHandlers';
-import { decodeToken } from '@/common/utils/jwt';
+import { UnauthorizedError } from '@/errors/unauthorized-error';
+import { ServiceResponse } from '@/models/serviceResponse';
+import { handleServiceResponse } from '@/utils/httpHandlers';
+import { decodeToken } from '@/utils/jwt';
 import { Request, RequestHandler, Response } from 'express';
 import { Me_ResBodyObj } from './model';
 

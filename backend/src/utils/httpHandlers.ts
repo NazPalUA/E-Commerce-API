@@ -1,4 +1,4 @@
-import { ServiceResponse } from '@/common/models/serviceResponse';
+import { ServiceResponse } from '@/models/serviceResponse';
 import type { Request, Response } from 'express';
 import { infer as ZodInfer, ZodObject } from 'zod';
 

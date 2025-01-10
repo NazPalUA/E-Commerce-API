@@ -1,4 +1,4 @@
-import { commonValidations } from '@/common/utils/commonValidation';
+import { commonValidations } from '@/utils/commonValidation';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import bcrypt from 'bcrypt';
 import { z } from 'zod';

@@ -1,15 +1,9 @@
-import { userRepo } from '@/common/db/repos/users/user.repo';
-import { NotFoundError } from '@/common/errors/not-found-error';
-import { UnauthorizedError } from '@/common/errors/unauthorized-error';
-import { ServiceResponse } from '@/common/models/serviceResponse';
-import {
-  handleServiceResponse,
-  validateReq,
-} from '@/common/utils/httpHandlers';
-import {
-  attachCookiesToResponse,
-  getTokenPayloadFromUser,
-} from '@/common/utils/jwt';
+import { userRepo } from '@/db/repos/users/user.repo';
+import { NotFoundError } from '@/errors/not-found-error';
+import { UnauthorizedError } from '@/errors/unauthorized-error';
+import { ServiceResponse } from '@/models/serviceResponse';
+import { handleServiceResponse, validateReq } from '@/utils/httpHandlers';
+import { attachCookiesToResponse, getTokenPayloadFromUser } from '@/utils/jwt';
 import type { Request, RequestHandler, Response } from 'express';
 import { UpdateUserInfo_Req_Schema, UpdateUserInfo_ResBodyObj } from './model';
 

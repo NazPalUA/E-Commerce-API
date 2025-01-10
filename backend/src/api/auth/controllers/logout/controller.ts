@@ -1,6 +1,6 @@
-import { ServiceResponse } from '@/common/models/serviceResponse';
-import { handleServiceResponse } from '@/common/utils/httpHandlers';
-import { clearCookies } from '@/common/utils/jwt';
+import { ServiceResponse } from '@/models/serviceResponse';
+import { handleServiceResponse } from '@/utils/httpHandlers';
+import { clearCookies } from '@/utils/jwt';
 import { Request, RequestHandler, Response } from 'express';
 import { Logout_ResBodyObj } from './model';
 
