@@ -1,3 +1,4 @@
+import { UserRoles } from '@/models/userRoles';
 import { commonValidations } from '@/utils/commonValidation';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import bcrypt from 'bcrypt';
@@ -15,7 +16,7 @@ export const User_DbEntity_Schema = z
     password: commonValidations.password.transform(password =>
       bcrypt.hashSync(password, 10)
     ),
-    role: z.enum(['admin', 'user']).default('user'),
+    role: z.nativeEnum(UserRoles).default(UserRoles.USER),
     createdAt: z.date().default(new Date()),
     updatedAt: z.date().default(new Date()),
   })

@@ -1,5 +1,6 @@
 import { User_DTO_Schema } from '@/db/repos/users/user.model';
 import { authenticate, authorize } from '@/middleware/authenticate';
+import { UserRoles } from '@/models/userRoles';
 import { OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
 import { Router } from 'express';
 import { getAllUsers } from './controllers/getAllUsers/controller';
@@ -18,13 +19,13 @@ export const userRouter = Router();
 
 userRegistry.register('User', User_DTO_Schema);
 
-userRouter.get('/', authenticate, authorize('admin'), getAllUsers);
+userRouter.get('/', authenticate, authorize(UserRoles.ADMIN), getAllUsers);
 userRegistry.registerPath(getUsersRouterConfig);
 
 userRouter.get('/me', authenticate, getMe);
 userRegistry.registerPath(getMeRouterConfig);
 
-userRouter.get('/:id', authenticate, authorize('admin'), getSingleUser);
+userRouter.get('/:id', authenticate, authorize(UserRoles.ADMIN), getSingleUser);
 userRegistry.registerPath(getUserRouterConfig);
 
 userRouter.patch('/update-password', authenticate, updateUserPassword);

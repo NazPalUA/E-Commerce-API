@@ -1,6 +1,7 @@
 import { BadRequestError } from '@/errors/bad-request-error';
 import { NotFoundError } from '@/errors/not-found-error';
 import { UnauthorizedError } from '@/errors/unauthorized-error';
+import { UserRoles } from '@/models/userRoles';
 import bcrypt from 'bcrypt';
 import { Collection, ObjectId } from 'mongodb';
 import { collections } from '../..';
@@ -36,7 +37,7 @@ export class UserRepository {
     const candidate = User_DbEntity_Schema.parse({
       ...user,
       _id: new ObjectId(),
-      role: isFirstUser ? 'admin' : 'user',
+      role: isFirstUser ? UserRoles.ADMIN : UserRoles.USER,
     });
     const result = await this.collection.insertOne(candidate);
     const userDTO = getUserDTO({

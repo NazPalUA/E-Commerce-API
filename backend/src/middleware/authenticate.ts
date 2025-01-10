@@ -1,3 +1,4 @@
+import { UserRole } from '@/models/userRoles';
 import { NextFunction, Request, Response } from 'express';
 import { ForbiddenError } from '../errors/forbidden-error';
 import { UnauthorizedError } from '../errors/unauthorized-error';
@@ -27,8 +28,6 @@ export const authenticate = (
     throw new UnauthorizedError('Invalid authentication token');
   }
 };
-
-export type UserRole = 'admin' | 'user';
 
 export const authorize = (...roles: UserRole[]) => {
   return (req: Request, res: Response, next: NextFunction): void => {
