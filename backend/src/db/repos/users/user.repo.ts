@@ -1,5 +1,4 @@
 import { BadRequestError } from '@/errors/bad-request-error';
-import { NotFoundError } from '@/errors/not-found-error';
 import { UnauthorizedError } from '@/errors/unauthorized-error';
 import { UserRoles } from '@/models/userRoles';
 import bcrypt from 'bcrypt';
@@ -65,9 +64,6 @@ export class UserRepository {
     currentPassword: string,
     newPassword: string
   ): Promise<void> {
-    const user = await this.collection.findOne({ _id: new ObjectId(userId) });
-    if (!user) throw new NotFoundError('User');
-
     const isPasswordCorrect = await this.checkPassword(userId, currentPassword);
     if (!isPasswordCorrect) throw new UnauthorizedError('Incorrect password');
 
