@@ -53,7 +53,7 @@ export class UserRepository {
     const updatedUser = await this.collection.findOneAndUpdate(
       { _id: new ObjectId(userId) },
       { $set: { ...userData, updatedAt: new Date() } },
-      { returnDocument: 'after' }
+      { returnDocument: 'after', projection: { password: 0 } }
     );
 
     return updatedUser ? getUserDTO(updatedUser) : null;
@@ -87,7 +87,7 @@ export class UserRepository {
 
   public async findAllUsers(): Promise<User_DTO[]> {
     return this.collection
-      .find()
+      .find({ role: 'user' }, { projection: { password: 0 } })
       .toArray()
       .then(users => {
         return users.map(user => getUserDTO(user));
@@ -95,15 +95,19 @@ export class UserRepository {
   }
 
   public async findUserById(userId: string): Promise<User_DTO | null> {
-    return this.collection.findOne({ _id: new ObjectId(userId) }).then(user => {
-      return user ? getUserDTO(user) : null;
-    });
+    return this.collection
+      .findOne({ _id: new ObjectId(userId) }, { projection: { password: 0 } })
+      .then(user => {
+        return user ? getUserDTO(user) : null;
+      });
   }
 
   public async findUserByEmail(email: string): Promise<User_DTO | null> {
-    return this.collection.findOne({ email }).then(user => {
-      return user ? getUserDTO(user) : null;
-    });
+    return this.collection
+      .findOne({ email }, { projection: { password: 0 } })
+      .then(user => {
+        return user ? getUserDTO(user) : null;
+      });
   }
 
   public async countDocuments(): Promise<number> {

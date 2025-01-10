@@ -25,6 +25,7 @@ export async function connectDB(): Promise<Db> {
 
     // Create indexes
     await collections.users.createIndex({ email: 1 }, { unique: true });
+    await collections.users.createIndex({ role: 1 });
 
     logger.info(`Successfully connected to database: ${db.databaseName}`);
 
