@@ -35,7 +35,7 @@ app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/users', userRouter);
 
 // Swagger UI
-app.use('/', openAPIRouter);
+app.use('/api-docs/v1', openAPIRouter);
 
 // Not found
 app.use(notFound);
