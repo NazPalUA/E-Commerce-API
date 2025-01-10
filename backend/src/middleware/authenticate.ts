@@ -2,7 +2,7 @@ import { UserRole } from '@/models/userRoles';
 import { NextFunction, Request, Response } from 'express';
 import { ForbiddenError } from '../errors/forbidden-error';
 import { UnauthorizedError } from '../errors/unauthorized-error';
-import { decodeToken, isTokenValid } from '../utils/jwt';
+import { verifyToken } from '../utils/jwt';
 
 export const authenticate = (
   req: Request,
@@ -15,18 +15,10 @@ export const authenticate = (
     throw new UnauthorizedError('Authentication token missing');
   }
 
-  if (!isTokenValid(token)) {
-    throw new UnauthorizedError('Invalid authentication token');
-  }
-
-  try {
-    const decoded = decodeToken(token);
-    req.userId = decoded.id;
-    req.userRole = decoded.role;
-    next();
-  } catch (error) {
-    throw new UnauthorizedError('Invalid authentication token');
-  }
+  const payload = verifyToken(token);
+  req.userId = payload.id;
+  req.userRole = payload.role;
+  next();
 };
 
 export const authorize = (...roles: UserRole[]) => {

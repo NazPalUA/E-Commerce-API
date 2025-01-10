@@ -1,3 +1,4 @@
+import { UnauthorizedError } from '@/errors/unauthorized-error';
 import { Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { z } from 'zod';
@@ -28,17 +29,22 @@ const createToken = (payload: TokenPayload) => {
   });
 };
 
-export const isTokenValid = (token: string) => {
-  return jwt.verify(token, env.JWT_SECRET);
+export const verifyToken = (token: string) => {
+  try {
+    const payload = jwt.verify(token, env.JWT_SECRET);
+    return DecodedToken_Schema.parse(payload);
+  } catch (error) {
+    throw new UnauthorizedError('Invalid or expired authentication token');
+  }
 };
 
 export const decodeToken = (token: string) => {
-  const decoded = jwt.decode(token);
-  if (!decoded) {
+  try {
+    const decoded = jwt.decode(token);
+    return DecodedToken_Schema.parse(decoded);
+  } catch (error) {
     throw new BadRequestError('Invalid token');
   }
-
-  return DecodedToken_Schema.parse(decoded);
 };
 
 export const refreshToken = (token: string) => {
@@ -68,7 +74,6 @@ export const attachCookiesToResponse = (
 
   setTokenCookie(res, oneDay, token);
 };
-
 export const clearCookies = (res: Response) => {
   setTokenCookie(res, 0);
 };
