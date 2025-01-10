@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { ForbiddenError } from '../errors/forbidden-error';
 import { UnauthorizedError } from '../errors/unauthorized-error';
-import { decodeToken } from '../utils/jwt';
+import { decodeToken, isTokenValid } from '../utils/jwt';
 
 export const authenticate = (
   req: Request,
@@ -12,6 +12,10 @@ export const authenticate = (
 
   if (!token) {
     throw new UnauthorizedError('Authentication token missing');
+  }
+
+  if (!isTokenValid(token)) {
+    throw new UnauthorizedError('Invalid authentication token');
   }
 
   try {
