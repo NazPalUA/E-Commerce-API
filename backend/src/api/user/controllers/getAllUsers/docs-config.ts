@@ -6,6 +6,7 @@ export const getUsersRouterConfig: RouteConfig = {
   method: 'get',
   path: '/api/v1/users',
   tags: ['User'],
+  summary: '(Require admin access)',
   // request: { query: GetAllUsers_Req_Schema.shape.query },
   responses: createApiResponse(GetAllUsers_ResBodyObj_Schema, 'Success'),
 };
