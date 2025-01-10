@@ -1,6 +1,6 @@
 import { userRepo } from '@/common/db/repos/users/user.repo';
-import { ForbiddenError } from '@/common/errors/forbidden-error';
 import { NotFoundError } from '@/common/errors/not-found-error';
+import { UnauthorizedError } from '@/common/errors/unauthorized-error';
 import { ServiceResponse } from '@/common/models/serviceResponse';
 import {
   handleServiceResponse,
@@ -17,26 +17,19 @@ export const updateUserInfo: RequestHandler = async (
   req: Request,
   res: Response
 ) => {
-  const { params, body: userData } = validateReq(
-    req,
-    UpdateUserInfo_Req_Schema
-  );
+  const { body: userData } = validateReq(req, UpdateUserInfo_Req_Schema);
 
-  const hasAccess = params.id === req.userId;
-  if (!hasAccess) {
-    throw new ForbiddenError('You are not allowed to update this user');
-  }
+  const userId = req.userId;
+  if (!userId) throw new UnauthorizedError('User ID not found');
 
-  const user = await userRepo.updateUser(params.id, userData);
-  if (!user) {
-    throw new NotFoundError('User');
-  }
+  const user = await userRepo.updateUser(userId, userData);
+  if (!user) throw new NotFoundError('User');
 
   const tokenUser = getTokenPayloadFromUser(user);
   attachCookiesToResponse(res, tokenUser);
 
   const serviceResponse = ServiceResponse.success<UpdateUserInfo_ResBodyObj>(
-    'User found',
+    'User info updated',
     user
   );
   handleServiceResponse(serviceResponse, res);

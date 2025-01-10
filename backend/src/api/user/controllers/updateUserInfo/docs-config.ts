@@ -7,10 +7,9 @@ import {
 
 export const updateUserRouterConfig: RouteConfig = {
   method: 'patch',
-  path: '/api/v1/users/{id}',
+  path: '/api/v1/users/update-info',
   tags: ['User'],
   request: {
-    params: UpdateUserInfo_Req_Schema.shape.params,
     body: {
       content: {
         'application/json': {

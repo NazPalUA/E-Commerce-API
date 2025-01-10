@@ -7,10 +7,9 @@ import {
 
 export const updateUserPasswordRouterConfig: RouteConfig = {
   method: 'patch',
-  path: '/api/v1/users/{id}/password',
+  path: '/api/v1/users/update-password',
   tags: ['User'],
   request: {
-    params: UpdateUserPassword_Req_Schema.shape.params,
     body: {
       content: {
         'application/json': {

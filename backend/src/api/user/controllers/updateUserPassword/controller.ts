@@ -1,5 +1,5 @@
 import { userRepo } from '@/common/db/repos/users/user.repo';
-import { ForbiddenError } from '@/common/errors/forbidden-error';
+import { UnauthorizedError } from '@/common/errors/unauthorized-error';
 import { ServiceResponse } from '@/common/models/serviceResponse';
 import {
   handleServiceResponse,
@@ -16,14 +16,11 @@ export const updateUserPassword: RequestHandler = async (
   res: Response
 ) => {
   const {
-    params: { id: userId },
     body: { currentPassword, newPassword },
   } = validateReq(req, UpdateUserPassword_Req_Schema);
 
-  const hasAccess = userId === req.userId;
-  if (!hasAccess) {
-    throw new ForbiddenError('You are not allowed to update this user');
-  }
+  const userId = req.userId;
+  if (!userId) throw new UnauthorizedError('User ID not found');
 
   await userRepo.updatePassword(userId, currentPassword, newPassword);
 

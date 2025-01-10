@@ -19,11 +19,11 @@ userRegistry.register('User', User_DTO_Schema);
 userRouter.get('/', authenticate, authorize('admin'), getAllUsers);
 userRegistry.registerPath(getUsersRouterConfig);
 
-userRouter.get('/:id', authenticate, getSingleUser);
-userRegistry.registerPath(getUserRouterConfig);
+userRouter.patch('/update-password', authenticate, updateUserPassword);
+userRegistry.registerPath(updateUserPasswordRouterConfig);
 
-userRouter.patch('/:id', authenticate, updateUserInfo);
+userRouter.patch('/update-info', authenticate, updateUserInfo);
 userRegistry.registerPath(updateUserRouterConfig);
 
-userRouter.patch('/:id/password', authenticate, updateUserPassword);
-userRegistry.registerPath(updateUserPasswordRouterConfig);
+userRouter.get('/:id', authenticate, authorize('admin'), getSingleUser);
+userRegistry.registerPath(getUserRouterConfig);
