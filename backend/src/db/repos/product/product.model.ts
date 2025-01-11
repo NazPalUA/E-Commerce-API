@@ -1,5 +1,6 @@
 import { commonValidations } from '@/utils/commonValidation';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
+import { ObjectId } from 'mongodb';
 import { z } from 'zod';
 import { ProductCategories } from './constants/ProductCategories';
 import { ProductCompanies } from './constants/ProductCompanies';
@@ -22,7 +23,7 @@ export const Product_DbEntity_Schema = z
     freeShipping: z.boolean().default(false),
     inventory: z.number().int().nonnegative(),
     averageRating: z.number().min(0).max(5).default(0),
-    user: commonValidations.objectId,
+    user: z.string().transform(id => new ObjectId(id)),
     createdAt: z.date().default(new Date()),
     updatedAt: z.date().default(new Date()),
   })
