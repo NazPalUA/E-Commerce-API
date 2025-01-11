@@ -1,4 +1,4 @@
-import type { Product } from '@/api/product/productModel';
+import type { Product } from '@/api/product (Obsolete)/productModel';
 
 export const products: Product[] = [
   {
