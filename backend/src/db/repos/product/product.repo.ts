@@ -13,6 +13,17 @@ export class ProductRepository {
     return collections.products;
   }
 
+  public async isProductOwner(
+    productId: string,
+    userId: string
+  ): Promise<boolean> {
+    const product = await this.collection.findOne(
+      { _id: new ObjectId(productId) },
+      { projection: { user: 1 } }
+    );
+    return product?.user.toString() === userId;
+  }
+
   public async insertProduct(product: NewProduct): Promise<Product_DTO> {
     const candidate = Product_DbEntity_Schema.parse({
       ...product,

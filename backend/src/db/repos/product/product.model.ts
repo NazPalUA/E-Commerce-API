@@ -33,14 +33,17 @@ export const Product_DbEntity_Schema = z
 export type Product_DTO = z.infer<typeof Product_DTO_Schema>;
 export const Product_DTO_Schema = Product_DbEntity_Schema.omit({
   _id: true,
+  user: true,
 }).extend({
   id: commonValidations.id,
+  userId: commonValidations.id,
 });
 
 export const getProductDTO = (product: Product_DbEntity): Product_DTO => {
-  const { _id, ...rest } = product;
+  const { _id, user, ...rest } = product;
   return {
     ...rest,
     id: _id.toString(),
+    userId: user.toString(),
   };
 };
