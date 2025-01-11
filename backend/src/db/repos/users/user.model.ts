@@ -1,8 +1,8 @@
-import { UserRoles } from '@/models/userRoles';
 import { commonValidations } from '@/utils/commonValidation';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import bcrypt from 'bcrypt';
 import { z } from 'zod';
+import { UserRoles } from './constants';
 extendZodWithOpenApi(z);
 
 export type User_DbEntity = z.infer<typeof User_DbEntity_Schema>;
