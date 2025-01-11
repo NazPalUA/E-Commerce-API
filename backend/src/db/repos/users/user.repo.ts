@@ -1,9 +1,9 @@
 import { BadRequestError } from '@/errors/bad-request-error';
 import { UnauthorizedError } from '@/errors/unauthorized-error';
-import { UserRoles } from '@/models/userRoles';
 import bcrypt from 'bcrypt';
 import { Collection, ObjectId } from 'mongodb';
 import { collections } from '../..';
+import { UserRoles } from './constants';
 import {
   getUserDTO,
   NewUser,

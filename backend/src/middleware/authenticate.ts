@@ -1,4 +1,4 @@
-import { UserRole } from '@/models/userRoles';
+import { UserRole } from '@/db/repos/users/constants';
 import { NextFunction, Request, Response } from 'express';
 import { ForbiddenError } from '../errors/forbidden-error';
 import { UnauthorizedError } from '../errors/unauthorized-error';
