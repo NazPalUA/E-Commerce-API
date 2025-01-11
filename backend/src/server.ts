@@ -12,6 +12,7 @@ import cors from 'cors';
 import express, { type Express } from 'express';
 import helmet from 'helmet';
 import { pino } from 'pino';
+import { productRouter } from './api/product/productRouter';
 const logger = pino({ name: 'server start' });
 const app: Express = express();
 
@@ -33,6 +34,7 @@ app.use(requestLogger);
 app.use('/api/v1/health-check', healthCheckRouter);
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/products', productRouter);
 
 // Swagger UI
 app.use('/api-docs/v1', openAPIRouter);
