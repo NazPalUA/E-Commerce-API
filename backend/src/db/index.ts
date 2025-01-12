@@ -1,10 +1,7 @@
 import { env } from '@/utils/envConfig';
 import { Collection, Db, MongoClient } from 'mongodb';
-import { pino } from 'pino';
 import { Product_DbEntity } from './repos/products/product.model';
 import { User_DbEntity } from './repos/users/user.model';
-
-const logger = pino({ name: 'database-service' });
 
 interface DatabaseCollections {
   users: Collection<User_DbEntity>;
@@ -18,7 +15,7 @@ const client = new MongoClient(env.MONGODB_URI);
 export async function connectDB(): Promise<Db> {
   try {
     await client.connect();
-    logger.info('Connected to MongoDB');
+    console.log('Connected to MongoDB');
 
     const db = client.db(env.DB_NAME);
 
@@ -36,12 +33,12 @@ export async function connectDB(): Promise<Db> {
     await collections.products.createIndex({ category: 1 });
     await collections.products.createIndex({ company: 1 });
 
-    logger.info(`Successfully connected to database: ${db.databaseName}`);
+    console.log(`Successfully connected to database: ${db.databaseName}`);
 
     return db;
   } catch (error) {
-    logger.error('MongoDB connection error:', error);
-    logger.error('Please make sure MongoDB is running on your system');
+    console.error('MongoDB connection error:', error);
+    console.error('Please make sure MongoDB is running on your system');
     process.exit(1);
   }
 }

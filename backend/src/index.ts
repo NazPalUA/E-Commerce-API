@@ -1,20 +1,21 @@
+import { app } from '@/server';
 import { env } from '@/utils/envConfig';
-import { app, logger } from '@/server';
 import { connectDB } from './db';
 
 async function startServer() {
   // Attempt DB connection before starting the server
   await connectDB();
 
-  const server = app.listen(env.PORT, () => {
-    const { NODE_ENV, HOST, PORT } = env;
-    logger.info(`Server (${NODE_ENV}) running on http://${HOST}:${PORT}`);
+  const { PORT, HOST, NODE_ENV } = env;
+
+  const server = app.listen(PORT, HOST, () => {
+    console.log(`Server (${NODE_ENV}) running on http://${HOST}:${PORT}`);
   });
 
   const onCloseSignal = () => {
-    logger.info('SIGINT or SIGTERM received. Shutting down...');
+    console.log('SIGINT or SIGTERM received. Shutting down...');
     server.close(() => {
-      logger.info('Server closed');
+      console.log('Server closed');
       process.exit();
     });
     // Force shutdown after 10s
@@ -25,6 +26,6 @@ async function startServer() {
 }
 
 startServer().catch(error => {
-  logger.error(error);
+  console.error(error);
   process.exit(1);
 });
