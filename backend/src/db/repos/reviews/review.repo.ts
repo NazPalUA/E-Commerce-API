@@ -1,4 +1,4 @@
-import { Collection, ObjectId } from 'mongodb';
+import { ClientSession, Collection, ObjectId } from 'mongodb';
 import { collections } from '../..';
 import {
   getReviewDTO,
@@ -95,6 +95,19 @@ export class ReviewRepository {
       _id: new ObjectId(reviewId),
     });
     return result.deletedCount === 1;
+  }
+
+  public async deleteReviewsByProduct(
+    productId: string,
+    session?: ClientSession
+  ): Promise<boolean> {
+    const result = await this.collection.deleteMany(
+      {
+        product: new ObjectId(productId),
+      },
+      { session }
+    );
+    return result.deletedCount > 0;
   }
 }
 

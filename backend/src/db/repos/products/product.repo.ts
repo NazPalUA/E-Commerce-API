@@ -1,4 +1,5 @@
-import { Collection, ObjectId } from 'mongodb';
+import { NotFoundError } from '@/errors/not-found-error';
+import { ClientSession, Collection, ObjectId } from 'mongodb';
 import { collections } from '../..';
 import {
   getProductDTO,
@@ -21,6 +22,7 @@ export class ProductRepository {
       { _id: new ObjectId(productId) },
       { projection: { user: 1 } }
     );
+    if (!product) throw new NotFoundError('Product');
     return product?.user.toString() === userId;
   }
 
@@ -80,10 +82,16 @@ export class ProductRepository {
       .then(products => products.map(product => getProductDTO(product)));
   }
 
-  public async deleteProduct(productId: string): Promise<boolean> {
-    const result = await this.collection.deleteOne({
-      _id: new ObjectId(productId),
-    });
+  public async deleteProduct(
+    productId: string,
+    session?: ClientSession
+  ): Promise<boolean> {
+    const result = await this.collection.deleteOne(
+      {
+        _id: new ObjectId(productId),
+      },
+      { session }
+    );
     return result.deletedCount === 1;
   }
 }

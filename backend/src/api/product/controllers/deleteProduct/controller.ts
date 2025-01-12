@@ -1,5 +1,8 @@
+import client from '@/db';
 import { productRepo } from '@/db/repos/products/product.repo';
+import { reviewRepo } from '@/db/repos/reviews/review.repo';
 import { ForbiddenError } from '@/errors/forbidden-error';
+import { InternalServerError } from '@/errors/server-error';
 import { UnauthorizedError } from '@/errors/unauthorized-error';
 import { ServiceResponse } from '@/models/serviceResponse';
 import { handleServiceResponse, validateReq } from '@/utils/httpHandlers';
@@ -19,12 +22,29 @@ export const deleteProduct: RequestHandler = async (
   if (!isProductOwner)
     throw new ForbiddenError('You are not the owner of this product');
 
-  await productRepo.deleteProduct(params.id);
+  const session = client.startSession();
 
-  const serviceResponse = ServiceResponse.success<DeleteProduct_ResBodyObj>(
-    'Product deleted successfully',
-    { deleted: true }
-  );
+  try {
+    await session.withTransaction(async () => {
+      const productDeleted = await productRepo.deleteProduct(
+        params.id,
+        session
+      );
+      if (!productDeleted)
+        throw new InternalServerError('Failed to delete product');
 
-  handleServiceResponse(serviceResponse, res);
+      await reviewRepo.deleteReviewsByProduct(params.id, session);
+    });
+
+    const serviceResponse = ServiceResponse.success<DeleteProduct_ResBodyObj>(
+      'Product and associated reviews deleted successfully',
+      { deleted: true }
+    );
+
+    handleServiceResponse(serviceResponse, res);
+  } catch (error) {
+    throw new InternalServerError('Failed to delete product');
+  } finally {
+    await session.endSession();
+  }
 };
