@@ -39,6 +39,11 @@ export async function connectDB(): Promise<Db> {
     await collections.products.createIndex({ company: 1 });
     await collections.reviews.createIndex({ user: 1 });
     await collections.reviews.createIndex({ product: 1 });
+    // user may only leave one review per product
+    await collections.reviews.createIndex(
+      { user: 1, product: 1 },
+      { unique: true }
+    );
 
     console.log(`Successfully connected to database: ${db.databaseName}`);
 
