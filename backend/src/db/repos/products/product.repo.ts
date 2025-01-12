@@ -94,6 +94,43 @@ export class ProductRepository {
     );
     return result.deletedCount === 1;
   }
+
+  /**
+   * Updates the average rating of a product based on its reviews.
+   * @param productId - The ID of the product.
+   * @param session - (Optional) The MongoDB session for transactions.
+   */
+  public async updateAverageRating(
+    productId: string,
+    session?: ClientSession
+  ): Promise<void> {
+    const pipeline = [
+      {
+        $match: { product: new ObjectId(productId) },
+      },
+      {
+        $group: {
+          _id: '$product',
+          averageRating: { $avg: '$rating' },
+        },
+      },
+    ];
+
+    const aggregationResult = await collections.reviews
+      .aggregate(pipeline, { session })
+      .toArray();
+
+    const averageRating =
+      aggregationResult[0]?.averageRating !== undefined
+        ? aggregationResult[0].averageRating
+        : 0;
+
+    await this.collection.updateOne(
+      { _id: new ObjectId(productId) },
+      { $set: { averageRating, updatedAt: new Date() } },
+      { session }
+    );
+  }
 }
 
 export const productRepo = new ProductRepository();

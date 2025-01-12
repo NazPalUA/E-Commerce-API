@@ -1,5 +1,7 @@
+import { NotFoundError } from '@/errors/not-found-error';
 import { ClientSession, Collection, ObjectId } from 'mongodb';
 import { collections } from '../..';
+import { productRepo } from '../products/product.repo';
 import {
   getReviewDTO,
   NewReview,
@@ -24,18 +26,24 @@ export class ReviewRepository {
     return review?.user.toString() === userId;
   }
 
-  public async insertReview(review: NewReview): Promise<Review_DTO> {
+  public async insertReview(
+    review: NewReview,
+    session?: ClientSession
+  ): Promise<Review_DTO> {
     const candidate = Review_DbEntity_Schema.parse({
       ...review,
       _id: new ObjectId(),
       createdAt: new Date(),
       updatedAt: new Date(),
     });
-    const result = await this.collection.insertOne(candidate);
+    const result = await this.collection.insertOne(candidate, { session });
     const reviewDTO = getReviewDTO({
       ...candidate,
       _id: result.insertedId,
     });
+
+    await productRepo.updateAverageRating(review.product.toString(), session);
+
     return reviewDTO;
   }
 
@@ -43,15 +51,22 @@ export class ReviewRepository {
     reviewId: string,
     reviewData: Partial<
       Omit<Review_DTO, 'id' | 'createdAt' | 'user' | 'product'>
-    >
+    >,
+    session?: ClientSession
   ): Promise<Review_DTO | null> {
     const updatedReview = await this.collection.findOneAndUpdate(
       { _id: new ObjectId(reviewId) },
       { $set: { ...reviewData, updatedAt: new Date() } },
-      { returnDocument: 'after' }
+      { returnDocument: 'after', session }
     );
 
-    return updatedReview ? getReviewDTO(updatedReview) : null;
+    if (!updatedReview) throw new NotFoundError('Review not found');
+
+    await productRepo.updateAverageRating(
+      updatedReview.product.toString(),
+      session
+    );
+    return getReviewDTO(updatedReview);
   }
 
   public async findAllReviews(): Promise<Review_DTO[]> {
@@ -90,11 +105,28 @@ export class ReviewRepository {
       .then(review => (review ? getReviewDTO(review) : null));
   }
 
-  public async deleteReview(reviewId: string): Promise<boolean> {
-    const result = await this.collection.deleteOne({
-      _id: new ObjectId(reviewId),
-    });
-    return result.deletedCount === 1;
+  public async deleteReview(
+    reviewId: string,
+    session?: ClientSession
+  ): Promise<boolean> {
+    const review = await this.collection.findOne(
+      { _id: new ObjectId(reviewId) },
+      { session }
+    );
+    if (review) {
+      const result = await this.collection.deleteOne(
+        { _id: new ObjectId(reviewId) },
+        { session }
+      );
+      if (result.deletedCount === 1) {
+        await productRepo.updateAverageRating(
+          review.product.toString(),
+          session
+        );
+        return true;
+      }
+    }
+    return false;
   }
 
   public async deleteReviewsByProduct(
@@ -107,7 +139,11 @@ export class ReviewRepository {
       },
       { session }
     );
-    return result.deletedCount > 0;
+    if (result.deletedCount > 0) {
+      await productRepo.updateAverageRating(productId, session);
+      return true;
+    }
+    return false;
   }
 }
 
