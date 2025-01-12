@@ -11,6 +11,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express, { type Express } from 'express';
 import helmet from 'helmet';
+import morgan from 'morgan';
 import { pino } from 'pino';
 import { productRouter } from './api/product/productRouter';
 const logger = pino({ name: 'server start' });
@@ -29,6 +30,7 @@ app.use(cookieParser(env.JWT_SECRET));
 
 // Request logging
 app.use(requestLogger);
+app.use(morgan('dev'));
 
 // Routes
 app.use('/api/v1/health-check', healthCheckRouter);
