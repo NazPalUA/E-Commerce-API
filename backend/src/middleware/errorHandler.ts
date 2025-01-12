@@ -7,8 +7,12 @@ import { ServiceResponse } from '../models/serviceResponse';
 import { handleServiceResponse } from '../utils/httpHandlers';
 
 const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
+  const logError = (type: string, message: string) => {
+    console.error(`[${type}] ${message}`);
+  };
+
   if (err instanceof BaseError) {
-    console.warn(`[BaseError] ${err.statusCode} - ${err.message}`);
+    logError('BaseError', `${err.statusCode} - ${err.message}`);
     const serviceResponse = ServiceResponse.failure(
       err.message,
       null,
@@ -24,7 +28,7 @@ const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
       return `(${path}) ${issue.message}`;
     });
 
-    console.warn(`[ZodError] Invalid input: ${issueSummaries.join(', ')}`);
+    logError('ZodError', `Invalid input: ${issueSummaries.join(', ')}`);
 
     const serviceResponse = ServiceResponse.failure(
       `Invalid input: ${issueSummaries.join(', ')}`,
@@ -43,7 +47,7 @@ const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
       const field = Object.keys(keyValue)[0];
       const value = keyValue[field];
 
-      console.warn(`[MongoServerError] Duplicate key error: ${field}=${value}`);
+      logError('MongoServerError', `Duplicate key error: ${field}=${value}`);
       const serviceResponse = ServiceResponse.failure(
         `${field} "${value}" already exists`,
         null,
@@ -55,7 +59,7 @@ const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
 
     // Connection Errors
     if (err.code === 'ECONNREFUSED') {
-      console.error('[MongoError] Database connection refused');
+      logError('MongoError', 'Database connection refused');
       const serviceResponse = ServiceResponse.failure(
         'Database connection error',
         null,
@@ -67,7 +71,7 @@ const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
 
     // Authentication Errors
     if (err.code === 18) {
-      console.error('[MongoError] Authentication failed');
+      logError('MongoError', 'Authentication failed');
       const serviceResponse = ServiceResponse.failure(
         'Database authentication error',
         null,
@@ -79,7 +83,7 @@ const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
 
     // Invalid Operation Errors
     if (err instanceof MongoServerError && err.code === 51) {
-      console.error('[MongoError] Invalid operation attempted');
+      logError('MongoError', 'Invalid operation attempted');
       const serviceResponse = ServiceResponse.failure(
         'Invalid database operation',
         null,
@@ -91,7 +95,7 @@ const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
 
     // Write Concern Errors
     if (err instanceof MongoServerError && err.code === 100) {
-      console.error('[MongoError] Write concern error');
+      logError('MongoError', 'Write concern error');
       const serviceResponse = ServiceResponse.failure(
         'Database write operation failed',
         null,
@@ -103,7 +107,7 @@ const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
 
     // Timeout Errors
     if (err.code === 'ETIMEDOUT') {
-      console.error('[MongoError] Operation timeout');
+      logError('MongoError', 'Operation timeout');
       const serviceResponse = ServiceResponse.failure(
         'Database operation timed out',
         null,
@@ -112,9 +116,8 @@ const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
       handleServiceResponse(serviceResponse, res);
       return;
     }
-
     // Generic MongoDB Error
-    console.error(`[MongoError] Unhandled MongoDB error: ${err.message}`);
+    logError('MongoError', `Unhandled MongoDB error: ${err.message}`);
     const serviceResponse = ServiceResponse.failure(
       'Database operation failed',
       null,
@@ -125,7 +128,7 @@ const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
   }
 
   // Fallback for unhandled errors
-  console.error(`[UnhandledError] ${err}`);
+  logError('UnhandledError', err.message || 'An unknown error occurred');
   const serviceResponse = ServiceResponse.failure(
     'An unknown error occurred',
     null,
