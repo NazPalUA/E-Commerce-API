@@ -1,5 +1,6 @@
 import { productRepo } from '@/db/repos/products/product.repo';
 import { reviewRepo } from '@/db/repos/reviews/review.repo';
+import { BadRequestError } from '@/errors/bad-request-error';
 import { NotFoundError } from '@/errors/not-found-error';
 import { UnauthorizedError } from '@/errors/unauthorized-error';
 import { ServiceResponse } from '@/models/serviceResponse';
@@ -19,6 +20,13 @@ export const createReview: RequestHandler = async (
 
   const product = await productRepo.findProductById(productId);
   if (!product) throw new NotFoundError('Product not found');
+
+  const alreadyReviewed = await reviewRepo.findReviewByUserAndProduct(
+    userId,
+    productId
+  );
+  if (alreadyReviewed)
+    throw new BadRequestError('User already reviewed this product');
 
   const review = await reviewRepo.insertReview({
     ...reviewData,

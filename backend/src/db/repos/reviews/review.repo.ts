@@ -81,6 +81,15 @@ export class ReviewRepository {
       .then(reviews => reviews.map(review => getReviewDTO(review)));
   }
 
+  public async findReviewByUserAndProduct(
+    userId: string,
+    productId: string
+  ): Promise<Review_DTO | null> {
+    return this.collection
+      .findOne({ user: new ObjectId(userId), product: new ObjectId(productId) })
+      .then(review => (review ? getReviewDTO(review) : null));
+  }
+
   public async deleteReview(reviewId: string): Promise<boolean> {
     const result = await this.collection.deleteOne({
       _id: new ObjectId(reviewId),
