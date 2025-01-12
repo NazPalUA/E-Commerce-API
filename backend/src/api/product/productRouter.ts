@@ -1,4 +1,4 @@
-import { Product_DTO_Schema } from '@/db/repos/product/product.model';
+import { Product_DTO_Schema } from '@/db/repos/products/product.model';
 import { UserRoles } from '@/db/repos/users/constants';
 import { authenticate, authorize } from '@/middleware/authenticate';
 import { OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';

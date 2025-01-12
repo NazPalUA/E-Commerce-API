@@ -1,4 +1,4 @@
-import { productRepo } from '@/db/repos/product/product.repo';
+import { productRepo } from '@/db/repos/products/product.repo';
 import { ForbiddenError } from '@/errors/forbidden-error';
 import { NotFoundError } from '@/errors/not-found-error';
 import { UnauthorizedError } from '@/errors/unauthorized-error';

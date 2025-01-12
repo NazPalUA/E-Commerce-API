@@ -1,7 +1,7 @@
 import { env } from '@/utils/envConfig';
 import { Collection, Db, MongoClient } from 'mongodb';
 import { pino } from 'pino';
-import { Product_DbEntity } from './repos/product/product.model';
+import { Product_DbEntity } from './repos/products/product.model';
 import { User_DbEntity } from './repos/users/user.model';
 
 const logger = pino({ name: 'database-service' });

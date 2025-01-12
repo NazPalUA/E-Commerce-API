@@ -1,4 +1,4 @@
-import { productRepo } from '@/db/repos/product/product.repo';
+import { productRepo } from '@/db/repos/products/product.repo';
 import { NotFoundError } from '@/errors/not-found-error';
 import { ServiceResponse } from '@/models/serviceResponse';
 import { handleServiceResponse } from '@/utils/httpHandlers';

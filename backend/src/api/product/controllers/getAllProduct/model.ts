@@ -1,4 +1,4 @@
-import { Product_DTO_Schema } from '@/db/repos/product/product.model';
+import { Product_DTO_Schema } from '@/db/repos/products/product.model';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import { z } from 'zod';
 
