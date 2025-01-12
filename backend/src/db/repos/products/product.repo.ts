@@ -18,6 +18,9 @@ export class ProductRepository {
     productId: string,
     userId: string
   ): Promise<boolean> {
+    if (!(await this.checkProductExists(productId)))
+      throw new NotFoundError('Product not found');
+
     const product = await this.collection.findOne(
       { _id: new ObjectId(productId) },
       { projection: { user: 1 } }
@@ -53,6 +56,9 @@ export class ProductRepository {
     productId: string,
     productData: Partial<Omit<Product_DTO, 'id' | 'createdAt' | 'user'>>
   ): Promise<Product_DTO | null> {
+    if (!(await this.checkProductExists(productId)))
+      throw new NotFoundError('Product not found');
+
     const updatedProduct = await this.collection.findOneAndUpdate(
       { _id: new ObjectId(productId) },
       { $set: { ...productData, updatedAt: new Date() } },
@@ -86,6 +92,9 @@ export class ProductRepository {
     productId: string,
     session?: ClientSession
   ): Promise<boolean> {
+    if (!(await this.checkProductExists(productId)))
+      throw new NotFoundError('Product not found');
+
     const result = await this.collection.deleteOne(
       {
         _id: new ObjectId(productId),
@@ -95,15 +104,13 @@ export class ProductRepository {
     return result.deletedCount === 1;
   }
 
-  /**
-   * Updates the average rating of a product based on its reviews.
-   * @param productId - The ID of the product.
-   * @param session - (Optional) The MongoDB session for transactions.
-   */
   public async updateAverageRating(
     productId: string,
     session?: ClientSession
   ): Promise<void> {
+    if (!(await this.checkProductExists(productId)))
+      throw new NotFoundError('Product not found');
+
     const pipeline = [
       {
         $match: { product: new ObjectId(productId) },

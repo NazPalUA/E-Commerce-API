@@ -19,11 +19,22 @@ export class ReviewRepository {
     reviewId: string,
     userId: string
   ): Promise<boolean> {
+    if (!(await this.checkReviewExists(reviewId)))
+      throw new NotFoundError('Review not found');
+
     const review = await this.collection.findOne(
       { _id: new ObjectId(reviewId) },
       { projection: { user: 1 } }
     );
     return review?.user.toString() === userId;
+  }
+
+  public async checkReviewExists(reviewId: string): Promise<boolean> {
+    const review = await this.collection.findOne(
+      { _id: new ObjectId(reviewId) },
+      { projection: { _id: 1 } }
+    );
+    return review !== null;
   }
 
   public async insertReview(
@@ -54,6 +65,9 @@ export class ReviewRepository {
     >,
     session?: ClientSession
   ): Promise<Review_DTO | null> {
+    if (!(await this.checkReviewExists(reviewId)))
+      throw new NotFoundError('Review not found');
+
     const updatedReview = await this.collection.findOneAndUpdate(
       { _id: new ObjectId(reviewId) },
       { $set: { ...reviewData, updatedAt: new Date() } },
@@ -113,19 +127,17 @@ export class ReviewRepository {
       { _id: new ObjectId(reviewId) },
       { session }
     );
-    if (review) {
-      const result = await this.collection.deleteOne(
-        { _id: new ObjectId(reviewId) },
-        { session }
-      );
-      if (result.deletedCount === 1) {
-        await productRepo.updateAverageRating(
-          review.product.toString(),
-          session
-        );
-        return true;
-      }
+    if (!review) throw new NotFoundError('Review not found');
+
+    const result = await this.collection.deleteOne(
+      { _id: new ObjectId(reviewId) },
+      { session }
+    );
+    if (result.deletedCount === 1) {
+      await productRepo.updateAverageRating(review.product.toString(), session);
+      return true;
     }
+
     return false;
   }
 
