@@ -9,6 +9,8 @@ import { deleteProduct } from './controllers/deleteProduct/controller';
 import { deleteProductRouterConfig } from './controllers/deleteProduct/docs-config';
 import { getAllProducts } from './controllers/getAllProduct/controller';
 import { getAllProductsRouterConfig } from './controllers/getAllProduct/docs-config';
+import { getProductReviews } from './controllers/getProductReviews/controller';
+import { getProductReviewsRouterConfig } from './controllers/getProductReviews/docs-config';
 import { getSingleProduct } from './controllers/getSingleProduct/controller';
 import { getSingleProductRouterConfig } from './controllers/getSingleProduct/docs-config';
 import { updateProduct } from './controllers/updateProduct/controller';
@@ -26,6 +28,10 @@ productRegistry.registerPath(getAllProductsRouterConfig);
 // Get single product (public)
 productRouter.get('/:id', getSingleProduct);
 productRegistry.registerPath(getSingleProductRouterConfig);
+
+// Get product reviews (public)
+productRouter.get('/:id/reviews', getProductReviews);
+productRegistry.registerPath(getProductReviewsRouterConfig);
 
 // Create product (authenticated)
 productRouter.post(

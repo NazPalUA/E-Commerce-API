@@ -24,6 +24,16 @@ export class ProductRepository {
     return product?.user.toString() === userId;
   }
 
+  public async checkProductExists(productId: string): Promise<boolean> {
+    const product = await this.collection.findOne(
+      {
+        _id: new ObjectId(productId),
+      },
+      { projection: { _id: 1 } }
+    );
+    return product !== null;
+  }
+
   public async insertProduct(product: NewProduct): Promise<Product_DTO> {
     const candidate = Product_DbEntity_Schema.parse({
       ...product,
