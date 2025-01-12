@@ -12,6 +12,7 @@ import express, { type Express } from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import { productRouter } from './api/product/productRouter';
+import { reviewRouter } from './api/review/reviewRouter';
 
 const app: Express = express();
 
@@ -34,6 +35,7 @@ app.use('/api/v1/health-check', healthCheckRouter);
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/products', productRouter);
+app.use('/api/v1/reviews', reviewRouter);
 
 // Swagger UI
 app.use('/api-docs/v1', openAPIRouter);

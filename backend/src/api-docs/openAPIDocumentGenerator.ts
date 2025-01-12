@@ -6,6 +6,7 @@ import {
 import { authRegistry } from '@/api/auth/authRouter';
 import { healthCheckRegistry } from '@/api/healthCheck/healthCheckRouter';
 import { productRegistry } from '@/api/product/productRouter';
+import { reviewRegistry } from '@/api/review/reviewRouter';
 import { userRegistry } from '@/api/user/userRouter';
 
 export function generateOpenAPIDocument() {
@@ -14,6 +15,7 @@ export function generateOpenAPIDocument() {
     userRegistry,
     authRegistry,
     productRegistry,
+    reviewRegistry,
   ]);
   const generator = new OpenApiGeneratorV3(registry.definitions);
 
