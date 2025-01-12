@@ -17,6 +17,7 @@ export const env = cleanEnv(process.env, {
   DB_NAME: str({ default: 'someDefaultDbName' }),
   USERS_COLLECTION: str({ default: 'users' }),
   PRODUCTS_COLLECTION: str({ default: 'products' }),
+  REVIEWS_COLLECTION: str({ default: 'reviews' }),
   ORDERS_COLLECTION: str({ default: 'orders' }),
   JWT_SECRET: str(),
   JWT_EXPIRATION_TIME: str({ default: '1h' }),

@@ -1,11 +1,13 @@
 import { env } from '@/utils/envConfig';
 import { Collection, Db, MongoClient } from 'mongodb';
 import { Product_DbEntity } from './repos/products/product.model';
+import { Review_DbEntity } from './repos/reviews/review.model';
 import { User_DbEntity } from './repos/users/user.model';
 
 interface DatabaseCollections {
   users: Collection<User_DbEntity>;
   products: Collection<Product_DbEntity>;
+  reviews: Collection<Review_DbEntity>;
 }
 
 export const collections = {} as DatabaseCollections;
@@ -24,6 +26,9 @@ export async function connectDB(): Promise<Db> {
     collections.products = db.collection<Product_DbEntity>(
       env.PRODUCTS_COLLECTION
     );
+    collections.reviews = db.collection<Review_DbEntity>(
+      env.REVIEWS_COLLECTION
+    );
 
     // Create indexes
     await collections.users.createIndex({ email: 1 }, { unique: true });
@@ -32,6 +37,8 @@ export async function connectDB(): Promise<Db> {
     await collections.products.createIndex({ featured: 1 });
     await collections.products.createIndex({ category: 1 });
     await collections.products.createIndex({ company: 1 });
+    await collections.reviews.createIndex({ user: 1 });
+    await collections.reviews.createIndex({ product: 1 });
 
     console.log(`Successfully connected to database: ${db.databaseName}`);
 
