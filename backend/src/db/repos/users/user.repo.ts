@@ -46,6 +46,31 @@ export class UserRepository {
     return userDTO;
   }
 
+  public async checkVerificationToken(
+    userEmail: string,
+    verificationToken: string
+  ): Promise<boolean> {
+    const user = await this.collection.findOne(
+      { email: userEmail },
+      { projection: { verificationToken: 1 } }
+    );
+    return user?.verificationToken === verificationToken;
+  }
+
+  public async verifyUser(userId: string): Promise<void> {
+    await this.collection.updateOne(
+      { _id: new ObjectId(userId) },
+      {
+        $set: {
+          isVerified: true,
+          verifiedDate: new Date(),
+          updatedAt: new Date(),
+          verificationToken: undefined,
+        },
+      }
+    );
+  }
+
   public async updateUser(
     userId: string,
     userData: Partial<Pick<User_DTO, 'name' | 'email'>>
