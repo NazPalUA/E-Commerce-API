@@ -16,6 +16,8 @@ export const login: RequestHandler = async (req: Request, res: Response) => {
   const isPasswordCorrect = await userRepo.checkPassword(user.id, password);
   if (!isPasswordCorrect) throw new UnauthorizedError('Invalid credentials');
 
+  if (!user.isVerified) throw new UnauthorizedError('User not verified');
+
   const tokenUser = getTokenPayloadFromUser(user);
 
   attachCookiesToResponse(res, tokenUser);
