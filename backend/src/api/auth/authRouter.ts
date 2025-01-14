@@ -9,6 +9,8 @@ import { getMe } from './controllers/me/controller';
 import { meRouterConfig } from './controllers/me/docs-config';
 import { register } from './controllers/register/controller';
 import { registerRouterConfig } from './controllers/register/docs-config';
+import { verifyEmail } from './controllers/verifyEmail/controller';
+import { verifyEmailRouterConfig } from './controllers/verifyEmail/docs-config';
 
 export const authRegistry = new OpenAPIRegistry();
 export const authRouter = Router();
@@ -24,3 +26,6 @@ authRegistry.registerPath(logoutRouterConfig);
 
 authRouter.get('/me', authenticate, getMe);
 authRegistry.registerPath(meRouterConfig);
+
+authRouter.post('/verify-email', verifyEmail);
+authRegistry.registerPath(verifyEmailRouterConfig);
