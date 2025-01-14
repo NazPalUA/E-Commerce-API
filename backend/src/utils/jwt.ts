@@ -25,7 +25,7 @@ export const DecodedToken_Schema = TokenPayload_Schema.extend({
 
 const createToken = (payload: TokenPayload) => {
   return jwt.sign(payload, env.JWT_SECRET, {
-    expiresIn: env.JWT_EXPIRATION_TIME,
+    expiresIn: env.JWT_LIFETIME,
   });
 };
 
