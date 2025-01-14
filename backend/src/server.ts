@@ -9,6 +9,7 @@ import { env } from '@/utils/envConfig';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express, { type Express } from 'express';
+import mongoSanitize from 'express-mongo-sanitize';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import { productRouter } from './api/product/productRouter';
@@ -26,6 +27,7 @@ app.use(cors({ origin: env.CORS_ORIGIN, credentials: true }));
 app.use(helmet());
 app.use(rateLimiter);
 app.use(cookieParser(env.JWT_SECRET));
+app.use(mongoSanitize());
 
 // Request logging
 app.use(morgan('dev'));
