@@ -16,6 +16,7 @@ export const env = cleanEnv(process.env, {
   MONGODB_URI: str(),
   DB_NAME: str({ default: 'someDefaultDbName' }),
   USERS_COLLECTION: str({ default: 'users' }),
+  TOKENS_COLLECTION: str({ default: 'tokens' }),
   PRODUCTS_COLLECTION: str({ default: 'products' }),
   REVIEWS_COLLECTION: str({ default: 'reviews' }),
   ORDERS_COLLECTION: str({ default: 'orders' }),

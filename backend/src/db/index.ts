@@ -2,12 +2,14 @@ import { env } from '@/utils/envConfig';
 import { Collection, Db, MongoClient } from 'mongodb';
 import { Product_DbEntity } from './repos/products/product.model';
 import { Review_DbEntity } from './repos/reviews/review.model';
+import { Token_DbEntity } from './repos/token/token.model';
 import { User_DbEntity } from './repos/users/user.model';
 
 interface DatabaseCollections {
   users: Collection<User_DbEntity>;
   products: Collection<Product_DbEntity>;
   reviews: Collection<Review_DbEntity>;
+  tokens: Collection<Token_DbEntity>;
 }
 
 export const collections = {} as DatabaseCollections;
@@ -29,6 +31,7 @@ export async function connectDB(): Promise<Db> {
     collections.reviews = db.collection<Review_DbEntity>(
       env.REVIEWS_COLLECTION
     );
+    collections.tokens = db.collection<Token_DbEntity>(env.TOKENS_COLLECTION);
 
     // Create indexes
     await collections.users.createIndex({ email: 1 }, { unique: true });
@@ -44,6 +47,11 @@ export async function connectDB(): Promise<Db> {
       { user: 1, product: 1 },
       { unique: true }
     );
+    await collections.tokens.createIndexes([
+      { key: { user: 1 } },
+      { key: { refreshToken: 1 }, unique: true },
+      { key: { createdAt: 1 }, expireAfterSeconds: 60 * 60 * 24 * 7 }, // TTL index
+    ]);
 
     console.log(`Successfully connected to database: ${db.databaseName}`);
 

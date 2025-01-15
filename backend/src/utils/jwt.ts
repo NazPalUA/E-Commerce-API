@@ -24,7 +24,7 @@ export const DecodedToken_Schema = TokenPayload_Schema.extend({
   exp: z.number(),
 });
 
-const createToken = (payload: TokenPayload) => {
+const createJWT = (payload: TokenPayload) => {
   return jwt.sign(payload, env.JWT_SECRET, {
     expiresIn: env.JWT_LIFETIME,
   });
@@ -50,8 +50,16 @@ export const decodeToken = (token: string) => {
 
 export const refreshToken = (token: string) => {
   try {
-    const decoded = jwt.verify(token, env.JWT_SECRET) as TokenPayload;
-    return createToken(decoded);
+    const decoded = verifyToken(token);
+
+    const cleanPayload: TokenPayload = {
+      id: decoded.id,
+      name: decoded.name,
+      email: decoded.email,
+      role: decoded.role,
+    };
+
+    return createJWT(cleanPayload);
   } catch (error) {
     throw new BadRequestError('Invalid or expired token');
   }
@@ -66,17 +74,35 @@ const setTokenCookie = (res: Response, expiresIn: number, token?: string) => {
   });
 };
 
+const setRefreshTokenCookie = (
+  res: Response,
+  expiresIn: number,
+  token?: string
+) => {
+  res.cookie('refreshToken', token ?? '', {
+    httpOnly: true,
+    expires: new Date(Date.now() + expiresIn),
+    secure: env.NODE_ENV === 'production',
+    signed: true,
+  });
+};
+
 export const attachCookiesToResponse = (
   res: Response,
-  payload: TokenPayload
+  userPayload: TokenPayload,
+  refreshToken: string
 ) => {
-  const token = createToken(payload);
-  const oneDay = 24 * 60 * 60 * 1000;
+  const accessTokenJWT = createJWT(userPayload);
+  const oneDay = 1000 * 60 * 60 * 24;
+  setTokenCookie(res, oneDay, accessTokenJWT);
 
-  setTokenCookie(res, oneDay, token);
+  const oneWeek = 7 * 24 * 60 * 60 * 1000;
+  setRefreshTokenCookie(res, oneWeek, refreshToken);
 };
+
 export const clearCookies = (res: Response) => {
   setTokenCookie(res, 0);
+  setRefreshTokenCookie(res, 0);
 };
 
 export const getTokenPayloadFromUser = (user: User_DTO) => {
@@ -85,5 +111,9 @@ export const getTokenPayloadFromUser = (user: User_DTO) => {
 };
 
 export const generateVerificationToken = () => {
+  return crypto.randomBytes(32).toString('hex');
+};
+
+export const generateRefreshToken = () => {
   return crypto.randomBytes(32).toString('hex');
 };

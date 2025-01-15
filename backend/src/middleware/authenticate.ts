@@ -1,23 +1,63 @@
+import { tokenRepo } from '@/db/repos/token/token.repo';
 import { UserRole } from '@/db/repos/users/constants';
+import { userRepo } from '@/db/repos/users/user.repo';
 import { NextFunction, Request, Response } from 'express';
 import { ForbiddenError } from '../errors/forbidden-error';
 import { UnauthorizedError } from '../errors/unauthorized-error';
-import { verifyToken } from '../utils/jwt';
+import {
+  attachCookiesToResponse,
+  generateRefreshToken,
+  getTokenPayloadFromUser,
+  verifyToken,
+} from '../utils/jwt';
 
-export const authenticate = (
+export const authenticate = async (
   req: Request,
   res: Response,
   next: NextFunction
-): void => {
-  const token = req.signedCookies['token'];
+): Promise<void> => {
+  const { token: accessToken, refreshToken } = req.signedCookies;
 
-  if (!token) {
+  if (!accessToken && !refreshToken) {
     throw new UnauthorizedError('Authentication token missing');
   }
 
-  const payload = verifyToken(token);
-  req.userId = payload.id;
-  req.userRole = payload.role;
+  if (accessToken) {
+    const payload = verifyToken(accessToken);
+    req.userId = payload.id;
+    req.userRole = payload.role;
+  } else {
+    if (!refreshToken) {
+      throw new UnauthorizedError('Refresh token missing');
+    }
+
+    // Use refreshToken directly from cookies
+    const token = await tokenRepo.findTokenByRefreshToken(
+      refreshToken as string
+    );
+    if (!token?.isValid) throw new UnauthorizedError('Invalid refresh token');
+
+    const user = await userRepo.findUserById(token.userId.toString());
+    if (!user) throw new UnauthorizedError('User no longer exists');
+
+    const userPayload = getTokenPayloadFromUser(user);
+    const newRefreshToken = generateRefreshToken();
+
+    await tokenRepo.invalidateUserTokens(user.id);
+    await tokenRepo.insertToken({
+      user: user.id,
+      refreshToken: newRefreshToken,
+      ip: req.ip || '',
+      userAgent: req.headers['user-agent'] || '',
+      isValid: true,
+    });
+
+    attachCookiesToResponse(res, userPayload, newRefreshToken);
+
+    req.userId = user.id;
+    req.userRole = user.role;
+  }
+
   next();
 };
 
