@@ -1,4 +1,5 @@
 import { UnauthorizedError } from '@/errors/unauthorized-error';
+import crypto from 'crypto';
 import { Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { z } from 'zod';
@@ -81,4 +82,8 @@ export const clearCookies = (res: Response) => {
 export const getTokenPayloadFromUser = (user: User_DTO) => {
   const { id, name, email, role } = user;
   return { id, name, email, role };
+};
+
+export const generateVerificationToken = () => {
+  return crypto.randomBytes(32).toString('hex');
 };

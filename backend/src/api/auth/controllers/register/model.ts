@@ -1,6 +1,5 @@
 import { User_DTO_Schema } from '@/db/repos/users/user.model';
 import { commonValidations } from '@/utils/commonValidation';
-import { TokenPayload_Schema } from '@/utils/jwt';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import { z } from 'zod';
 
@@ -22,4 +21,4 @@ export const Register_Req_Schema = z.object({
 
 // Response Schema
 export type Register_ResBodyObj = z.infer<typeof Register_ResBodyObj_Schema>;
-export const Register_ResBodyObj_Schema = TokenPayload_Schema;
+export const Register_ResBodyObj_Schema = User_DTO_Schema;

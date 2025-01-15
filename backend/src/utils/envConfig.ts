@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import { cleanEnv, host, num, port, str, testOnly } from 'envalid';
+import { bool, cleanEnv, host, num, port, str, testOnly } from 'envalid';
 
 dotenv.config();
 
@@ -21,4 +21,13 @@ export const env = cleanEnv(process.env, {
   ORDERS_COLLECTION: str({ default: 'orders' }),
   JWT_SECRET: str(),
   JWT_LIFETIME: str({ default: '1h' }),
+
+  EMAIL_HOST: str({ default: 'smtp.ethereal.email' }),
+  EMAIL_PORT: num({ default: 587 }),
+  EMAIL_SECURE: bool({ default: false }),
+  EMAIL_USER: str(),
+  EMAIL_PASSWORD: str(),
+  EMAIL_FROM_NAME: str({ default: 'E-Commerce API' }),
+  EMAIL_FROM_EMAIL: str(),
+  FRONTEND_URL: str({ default: 'http://localhost:3000' }),
 });
