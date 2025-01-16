@@ -38,12 +38,14 @@ export async function connectDB(): Promise<Db> {
     // Create indexes
     await Promise.all([
       // User indexes
+      // collections.users.dropIndexes(),
       collections.users.createIndexes([
         { key: { email: 1 }, unique: true },
         { key: { role: 1 } },
       ]),
 
       // Product indexes
+      // collections.products.dropIndexes(),
       collections.products.createIndexes([
         { key: { user: 1 } },
         { key: { featured: 1 } },
@@ -52,6 +54,7 @@ export async function connectDB(): Promise<Db> {
       ]),
 
       // Review indexes
+      // collections.reviews.dropIndexes(),
       collections.reviews.createIndexes([
         { key: { user: 1 } },
         { key: { product: 1 } },
@@ -59,6 +62,7 @@ export async function connectDB(): Promise<Db> {
       ]),
 
       // Token indexes
+      // collections.refreshTokens.dropIndexes(),
       collections.refreshTokens.createIndexes([
         { key: { refreshToken: 1 }, unique: true },
         { key: { user: 1 } },
