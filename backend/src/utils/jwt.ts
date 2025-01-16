@@ -9,13 +9,12 @@ import { commonValidations } from './commonValidation';
 import { env } from './envConfig';
 
 export type TokenPayload = z.infer<typeof TokenPayload_Schema>;
-export const TokenPayload_Schema = User_DbEntity_Schema.pick({
-  name: true,
-  email: true,
-  role: true,
-})
-  .extend({
+export const TokenPayload_Schema = z
+  .object({
     id: commonValidations.id,
+    name: User_DbEntity_Schema.shape.name,
+    email: User_DbEntity_Schema.shape.email,
+    role: User_DbEntity_Schema.shape.role,
   })
   .strict();
 
