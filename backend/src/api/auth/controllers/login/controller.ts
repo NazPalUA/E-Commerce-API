@@ -1,4 +1,4 @@
-import { NewToken } from '@/db/repos/refreshToken/token.model';
+import { RefreshToken_Input } from '@/db/repos/refreshToken/token.model';
 import { tokenRepo } from '@/db/repos/refreshToken/token.repo';
 import { userRepo } from '@/db/repos/users/user.repo';
 import { BadRequestError } from '@/errors/bad-request-error';
@@ -39,7 +39,7 @@ export const login: RequestHandler = async (req: Request, res: Response) => {
   const tokenUser = getTokenPayloadFromUser(user);
   const refreshToken = generateRefreshToken();
 
-  const refreshTokenPayload: NewToken = {
+  const refreshTokenPayload: RefreshToken_Input = {
     user: user.id,
     refreshToken,
     ip,

@@ -31,4 +31,6 @@ export const env = cleanEnv(process.env, {
   EMAIL_FROM_NAME: str({ default: 'E-Commerce API' }),
   EMAIL_FROM_EMAIL: str(),
   FRONTEND_URL: str({ default: 'http://localhost:3000' }),
+
+  REFRESH_TOKEN_TTL_DAYS: num({ default: 30 }),
 });

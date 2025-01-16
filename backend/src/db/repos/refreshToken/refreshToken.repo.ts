@@ -3,14 +3,14 @@ import { ClientSession, Collection, ObjectId } from 'mongodb';
 import { collections } from '../..';
 import {
   getTokenDTO,
-  NewToken,
-  Token_DbEntity,
-  Token_DbEntity_Schema,
-  Token_DTO,
-} from './token.model';
+  RefreshRefreshToken_DbEntity,
+  RefreshToken_DbEntity_Schema,
+  RefreshToken_DTO,
+  RefreshToken_Input,
+} from './refreshToken.model';
 
 export class TokenRepository {
-  private get collection(): Collection<Token_DbEntity> {
+  private get collection(): Collection<RefreshRefreshToken_DbEntity> {
     return collections.tokens;
   }
 
@@ -34,10 +34,10 @@ export class TokenRepository {
   }
 
   public async insertToken(
-    token: NewToken,
+    token: RefreshToken_Input,
     session?: ClientSession
-  ): Promise<Token_DTO> {
-    const candidate = Token_DbEntity_Schema.parse({
+  ): Promise<RefreshToken_DTO> {
+    const candidate = RefreshToken_DbEntity_Schema.parse({
       ...token,
       _id: new ObjectId(),
       createdAt: new Date(),
@@ -54,8 +54,8 @@ export class TokenRepository {
 
   public async updateToken(
     tokenId: string,
-    tokenData: Partial<Pick<Token_DTO, 'ip' | 'userAgent' | 'isValid'>>
-  ): Promise<Token_DTO | null> {
+    tokenData: Partial<Pick<RefreshToken_DTO, 'ip' | 'userAgent' | 'isValid'>>
+  ): Promise<RefreshToken_DTO | null> {
     if (!(await this.checkTokenExists(tokenId)))
       throw new NotFoundError('Token not found');
 
@@ -70,7 +70,9 @@ export class TokenRepository {
     return getTokenDTO(updatedToken);
   }
 
-  public async findTokenById(tokenId: string): Promise<Token_DTO | null> {
+  public async findTokenById(
+    tokenId: string
+  ): Promise<RefreshToken_DTO | null> {
     return this.collection
       .findOne({ _id: new ObjectId(tokenId) })
       .then(token => (token ? getTokenDTO(token) : null));
@@ -78,13 +80,13 @@ export class TokenRepository {
 
   public async findTokenByRefreshToken(
     refreshToken: string
-  ): Promise<Token_DTO | null> {
+  ): Promise<RefreshToken_DTO | null> {
     return this.collection
       .findOne({ refreshToken })
       .then(token => (token ? getTokenDTO(token) : null));
   }
 
-  public async findTokensByUser(userId: string): Promise<Token_DTO[]> {
+  public async findTokensByUser(userId: string): Promise<RefreshToken_DTO[]> {
     return this.collection
       .find({ user: new ObjectId(userId) })
       .toArray()
