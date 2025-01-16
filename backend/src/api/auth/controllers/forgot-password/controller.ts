@@ -1,7 +1,7 @@
 import { userRepo } from '@/db/repos/users/user.repo';
 import { ServiceResponse } from '@/models/serviceResponse';
 import { handleServiceResponse, validateReq } from '@/utils/httpHandlers';
-import { sendForgotPasswordEmail } from '@/utils/sendForgotPasswordEmail';
+import { sendForgotPasswordEmail } from '@/utils/mail/sendForgotPasswordEmail';
 import crypto from 'crypto';
 import { Request, RequestHandler, Response } from 'express';
 import { ForgotPassword_Req_Schema, ForgotPassword_ResBodyObj } from './model';
