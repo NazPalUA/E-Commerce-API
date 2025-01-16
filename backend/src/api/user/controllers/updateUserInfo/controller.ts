@@ -6,7 +6,7 @@ import { ServiceResponse } from '@/models/serviceResponse';
 import { handleServiceResponse, validateReq } from '@/utils/httpHandlers';
 import {
   attachCookiesToResponse,
-  generateRefreshToken,
+  generateRandomToken,
   getTokenPayloadFromUser,
 } from '@/utils/jwt';
 import type { Request, RequestHandler, Response } from 'express';
@@ -27,7 +27,7 @@ export const updateUserInfo: RequestHandler = async (
   const tokenUser = getTokenPayloadFromUser(user);
 
   // Generate a new refresh token
-  const newRefreshToken = generateRefreshToken();
+  const newRefreshToken = generateRandomToken();
 
   // Optionally, invalidate the old refresh tokens and store the new one in the database
   await tokenRepo.invalidateUserTokens(userId);

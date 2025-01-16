@@ -35,8 +35,13 @@ export const decodeAccessJWT = (token: string): DecodedAccessJWT => {
   }
 };
 
-const setTokenCookie = (res: Response, expiresIn: number, token?: string) => {
-  res.cookie('token', token ?? '', {
+const setTokenCookie = (
+  name: string,
+  res: Response,
+  expiresIn: number,
+  token: string = ''
+) => {
+  res.cookie(name, token, {
     httpOnly: true,
     expires: new Date(Date.now() + expiresIn),
     secure: env.NODE_ENV === 'production',
@@ -44,18 +49,14 @@ const setTokenCookie = (res: Response, expiresIn: number, token?: string) => {
   });
 };
 
+const setAccessJWTCookie = (res: Response, expiresIn: number, token?: string) =>
+  setTokenCookie('accessToken', res, expiresIn, token);
+
 const setRefreshTokenCookie = (
   res: Response,
   expiresIn: number,
   token?: string
-) => {
-  res.cookie('refreshToken', token ?? '', {
-    httpOnly: true,
-    expires: new Date(Date.now() + expiresIn),
-    secure: env.NODE_ENV === 'production',
-    signed: true,
-  });
-};
+) => setTokenCookie('refreshToken', res, expiresIn, token);
 
 export const attachCookiesToResponse = (
   res: Response,
@@ -64,14 +65,14 @@ export const attachCookiesToResponse = (
 ) => {
   const accessTokenJWT = createAccessJWT(userPayload);
   const oneDay = 1000 * 60 * 60 * 24;
-  setTokenCookie(res, oneDay, accessTokenJWT);
+  setAccessJWTCookie(res, oneDay, accessTokenJWT);
 
   const oneWeek = 7 * 24 * 60 * 60 * 1000;
   setRefreshTokenCookie(res, oneWeek, refreshToken);
 };
 
 export const clearCookies = (res: Response) => {
-  setTokenCookie(res, 0);
+  setAccessJWTCookie(res, 0);
   setRefreshTokenCookie(res, 0);
 };
 
@@ -80,10 +81,6 @@ export const getTokenPayloadFromUser = (user: User_DTO): AccessJWTPayload => {
   return { id, name, email, role };
 };
 
-export const generateVerificationToken = () => {
-  return crypto.randomBytes(32).toString('hex');
-};
-
-export const generateRefreshToken = () => {
+export const generateRandomToken = () => {
   return crypto.randomBytes(32).toString('hex');
 };

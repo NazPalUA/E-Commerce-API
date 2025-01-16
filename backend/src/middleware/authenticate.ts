@@ -7,7 +7,7 @@ import { ForbiddenError } from '../errors/forbidden-error';
 import { UnauthorizedError } from '../errors/unauthorized-error';
 import {
   attachCookiesToResponse,
-  generateRefreshToken,
+  generateRandomToken,
   getTokenPayloadFromUser,
   verifyAccessJWT,
 } from '../utils/jwt';
@@ -44,7 +44,7 @@ export const authenticate = async (
     if (!user) throw new UnauthorizedError('User no longer exists');
 
     const userPayload = getTokenPayloadFromUser(user);
-    const newRefreshToken = generateRefreshToken();
+    const newRefreshToken = generateRandomToken();
 
     await tokenRepo.invalidateUserTokens(user.id);
     await tokenRepo.insertToken({

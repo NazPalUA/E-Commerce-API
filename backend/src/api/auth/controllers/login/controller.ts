@@ -8,7 +8,7 @@ import { ServiceResponse } from '@/models/serviceResponse';
 import { handleServiceResponse, validateReq } from '@/utils/httpHandlers';
 import {
   attachCookiesToResponse,
-  generateRefreshToken,
+  generateRandomToken,
   getTokenPayloadFromUser,
 } from '@/utils/jwt';
 import { Request, RequestHandler, Response } from 'express';
@@ -37,7 +37,7 @@ export const login: RequestHandler = async (req: Request, res: Response) => {
   }
 
   const tokenUser = getTokenPayloadFromUser(user);
-  const refreshToken = generateRefreshToken();
+  const refreshToken = generateRandomToken();
 
   const refreshTokenPayload: RefreshToken_Input = {
     user: user.id,

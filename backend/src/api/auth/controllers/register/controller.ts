@@ -1,7 +1,7 @@
 import { userRepo } from '@/db/repos/users/user.repo';
 import { ServiceResponse } from '@/models/serviceResponse';
 import { handleServiceResponse, validateReq } from '@/utils/httpHandlers';
-import { generateVerificationToken } from '@/utils/jwt';
+import { generateRandomToken } from '@/utils/jwt';
 import { sendVerificationEmail } from '@/utils/mail/sendVerificationEmail';
 import { Request, RequestHandler, Response } from 'express';
 import { Register_Req_Schema, Register_ResBodyObj } from './model';
@@ -9,7 +9,7 @@ import { Register_Req_Schema, Register_ResBodyObj } from './model';
 export const register: RequestHandler = async (req: Request, res: Response) => {
   const { body } = validateReq(req, Register_Req_Schema);
 
-  const verificationToken = generateVerificationToken();
+  const verificationToken = generateRandomToken();
 
   const insertedUser = await userRepo.insertUser({
     ...body,
