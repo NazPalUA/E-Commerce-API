@@ -1,4 +1,4 @@
-import { tokenRepo } from '@/db/repos/refreshToken/token.repo';
+import { tokenRepo } from '@/db/repos/refreshToken/refreshToken.repo';
 import { BadRequestError } from '@/errors/bad-request-error';
 import { ServiceResponse } from '@/models/serviceResponse';
 import { handleServiceResponse } from '@/utils/httpHandlers';

@@ -1,5 +1,5 @@
-import { RefreshToken_Input } from '@/db/repos/refreshToken/token.model';
-import { tokenRepo } from '@/db/repos/refreshToken/token.repo';
+import { RefreshToken_Input } from '@/db/repos/refreshToken/refreshToken.model';
+import { tokenRepo } from '@/db/repos/refreshToken/refreshToken.repo';
 import { userRepo } from '@/db/repos/users/user.repo';
 import { BadRequestError } from '@/errors/bad-request-error';
 import { InternalServerError } from '@/errors/server-error';
