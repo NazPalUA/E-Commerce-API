@@ -1,6 +1,7 @@
 import { tokenRepo } from '@/db/repos/refreshToken/refreshToken.repo';
 import { UserRole } from '@/db/repos/users/constants';
 import { userRepo } from '@/db/repos/users/user.repo';
+import { DecodedAccessJWT_Schema } from '@/models/AccessToken';
 import { NextFunction, Request, Response } from 'express';
 import { ForbiddenError } from '../errors/forbidden-error';
 import { UnauthorizedError } from '../errors/unauthorized-error';
@@ -8,7 +9,7 @@ import {
   attachCookiesToResponse,
   generateRefreshToken,
   getTokenPayloadFromUser,
-  verifyToken,
+  verifyAccessJWT,
 } from '../utils/jwt';
 
 export const authenticate = async (
@@ -23,9 +24,11 @@ export const authenticate = async (
   }
 
   if (accessToken) {
-    const payload = verifyToken(accessToken);
-    req.userId = payload.id;
-    req.userRole = payload.role;
+    const decodedJWT = verifyAccessJWT(accessToken);
+    const { id, role } = DecodedAccessJWT_Schema.parse(decodedJWT);
+
+    req.userId = id;
+    req.userRole = role;
   } else {
     if (!refreshToken) {
       throw new UnauthorizedError('Refresh token missing');

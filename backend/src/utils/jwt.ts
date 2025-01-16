@@ -1,66 +1,37 @@
 import { UnauthorizedError } from '@/errors/unauthorized-error';
+import {
+  AccessJWTPayload,
+  DecodedAccessJWT,
+  DecodedAccessJWT_Schema,
+} from '@/models/AccessToken';
 import crypto from 'crypto';
 import { Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { z } from 'zod';
-import { User_DbEntity_Schema, User_DTO } from '../db/repos/users/user.model';
+import { User_DTO } from '../db/repos/users/user.model';
 import { BadRequestError } from '../errors/bad-request-error';
-import { commonValidations } from './commonValidation';
 import { env } from './envConfig';
 
-export type TokenPayload = z.infer<typeof TokenPayload_Schema>;
-export const TokenPayload_Schema = z
-  .object({
-    id: commonValidations.id,
-    name: User_DbEntity_Schema.shape.name,
-    email: User_DbEntity_Schema.shape.email,
-    role: User_DbEntity_Schema.shape.role,
-  })
-  .strict();
-
-export const DecodedToken_Schema = TokenPayload_Schema.extend({
-  iat: z.number(),
-  exp: z.number(),
-});
-
-const createJWT = (payload: TokenPayload) => {
+const createAccessJWT = (payload: AccessJWTPayload) => {
   return jwt.sign(payload, env.JWT_SECRET, {
     expiresIn: env.JWT_LIFETIME,
   });
 };
 
-export const verifyToken = (token: string) => {
+export const verifyAccessJWT = (token: string) => {
   try {
     const payload = jwt.verify(token, env.JWT_SECRET);
-    return DecodedToken_Schema.parse(payload);
+    return payload;
   } catch (error) {
     throw new UnauthorizedError('Invalid or expired authentication token');
   }
 };
 
-export const decodeToken = (token: string) => {
+export const decodeAccessJWT = (token: string): DecodedAccessJWT => {
   try {
     const decoded = jwt.decode(token);
-    return DecodedToken_Schema.parse(decoded);
+    return DecodedAccessJWT_Schema.parse(decoded);
   } catch (error) {
     throw new BadRequestError('Invalid token');
-  }
-};
-
-export const refreshToken = (token: string) => {
-  try {
-    const decoded = verifyToken(token);
-
-    const cleanPayload: TokenPayload = {
-      id: decoded.id,
-      name: decoded.name,
-      email: decoded.email,
-      role: decoded.role,
-    };
-
-    return createJWT(cleanPayload);
-  } catch (error) {
-    throw new BadRequestError('Invalid or expired token');
   }
 };
 
@@ -88,10 +59,10 @@ const setRefreshTokenCookie = (
 
 export const attachCookiesToResponse = (
   res: Response,
-  userPayload: TokenPayload,
+  userPayload: AccessJWTPayload,
   refreshToken: string
 ) => {
-  const accessTokenJWT = createJWT(userPayload);
+  const accessTokenJWT = createAccessJWT(userPayload);
   const oneDay = 1000 * 60 * 60 * 24;
   setTokenCookie(res, oneDay, accessTokenJWT);
 
@@ -104,7 +75,7 @@ export const clearCookies = (res: Response) => {
   setRefreshTokenCookie(res, 0);
 };
 
-export const getTokenPayloadFromUser = (user: User_DTO) => {
+export const getTokenPayloadFromUser = (user: User_DTO): AccessJWTPayload => {
   const { id, name, email, role } = user;
   return { id, name, email, role };
 };

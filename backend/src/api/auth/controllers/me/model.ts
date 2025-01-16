@@ -1,4 +1,4 @@
-import { TokenPayload_Schema } from '@/utils/jwt';
+import { AccessJWTPayload_Schema } from '@/models/AccessToken';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import { z } from 'zod';
 
@@ -10,4 +10,4 @@ extendZodWithOpenApi(z);
 
 // Response Schema
 export type Me_ResBodyObj = z.infer<typeof Me_ResBodyObj_Schema>;
-export const Me_ResBodyObj_Schema = TokenPayload_Schema;
+export const Me_ResBodyObj_Schema = AccessJWTPayload_Schema;

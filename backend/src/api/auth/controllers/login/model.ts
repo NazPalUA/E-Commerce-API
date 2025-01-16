@@ -1,5 +1,6 @@
+import { AccessJWTPayload_Schema } from '@/models/AccessToken';
 import { commonValidations } from '@/utils/commonValidation';
-import { TokenPayload_Schema } from '@/utils/jwt';
+
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import { z } from 'zod';
 
@@ -20,4 +21,4 @@ export const Login_Req_Schema = z.object({
 
 // Response Schema
 export type Login_ResBodyObj = z.infer<typeof Login_ResBodyObj_Schema>;
-export const Login_ResBodyObj_Schema = TokenPayload_Schema;
+export const Login_ResBodyObj_Schema = AccessJWTPayload_Schema;
