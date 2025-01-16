@@ -9,7 +9,7 @@ interface DatabaseCollections {
   users: Collection<User_DbEntity>;
   products: Collection<Product_DbEntity>;
   reviews: Collection<Review_DbEntity>;
-  tokens: Collection<RefreshRefreshToken_DbEntity>;
+  refreshTokens: Collection<RefreshRefreshToken_DbEntity>;
 }
 
 export const collections = {} as DatabaseCollections;
@@ -31,7 +31,7 @@ export async function connectDB(): Promise<Db> {
     collections.reviews = db.collection<Review_DbEntity>(
       env.REVIEWS_COLLECTION
     );
-    collections.tokens = db.collection<RefreshRefreshToken_DbEntity>(
+    collections.refreshTokens = db.collection<RefreshRefreshToken_DbEntity>(
       env.TOKENS_COLLECTION
     );
 
@@ -59,7 +59,7 @@ export async function connectDB(): Promise<Db> {
       ]),
 
       // Token indexes
-      collections.tokens.createIndexes([
+      collections.refreshTokens.createIndexes([
         { key: { refreshToken: 1 }, unique: true },
         { key: { user: 1 } },
         {

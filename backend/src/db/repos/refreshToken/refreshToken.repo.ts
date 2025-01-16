@@ -11,7 +11,7 @@ import {
 
 export class TokenRepository {
   private get collection(): Collection<RefreshRefreshToken_DbEntity> {
-    return collections.tokens;
+    return collections.refreshTokens;
   }
 
   public async isTokenOwner(tokenId: string, userId: string): Promise<boolean> {
