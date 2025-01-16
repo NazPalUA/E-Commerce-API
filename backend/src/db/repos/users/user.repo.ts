@@ -107,6 +107,32 @@ export class UserRepository {
       throw new Error('Failed to update password');
   }
 
+  public async resetPassword(
+    userId: string,
+    newPassword: string
+  ): Promise<void> {
+    const newHashedPassword =
+      User_DbEntity_Schema.shape.password.parse(newPassword);
+
+    const result = await this.collection.updateOne(
+      { _id: new ObjectId(userId) },
+      { $set: { password: newHashedPassword, updatedAt: new Date() } }
+    );
+    if (result.modifiedCount === 0)
+      throw new Error('Failed to update password');
+  }
+
+  public async updateUserPasswordResetToken(
+    userId: string,
+    passwordResetToken: string,
+    passwordResetTokenExpiration: Date
+  ): Promise<void> {
+    await this.collection.updateOne(
+      { _id: new ObjectId(userId) },
+      { $set: { passwordResetToken, passwordResetTokenExpiration } }
+    );
+  }
+
   public async findAllUsers(): Promise<User_DTO[]> {
     return this.collection
       .find({ role: 'user' }, { projection: { password: 0 } })

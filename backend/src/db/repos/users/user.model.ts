@@ -20,6 +20,8 @@ export const User_DbEntity_Schema = z
     isVerified: z.boolean().default(false),
     verifiedDate: z.date().optional(),
     role: z.nativeEnum(UserRoles).default(UserRoles.USER),
+    passwordResetToken: z.string().optional(),
+    passwordResetTokenExpiration: z.date().optional(),
     createdAt: z.date().default(new Date()),
     updatedAt: z.date().default(new Date()),
   })
