@@ -1,5 +1,5 @@
-import { NewToken } from '@/db/repos/token/token.model';
-import { tokenRepo } from '@/db/repos/token/token.repo';
+import { NewToken } from '@/db/repos/refreshToken/token.model';
+import { tokenRepo } from '@/db/repos/refreshToken/token.repo';
 import { userRepo } from '@/db/repos/users/user.repo';
 import { BadRequestError } from '@/errors/bad-request-error';
 import { InternalServerError } from '@/errors/server-error';

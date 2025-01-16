@@ -1,8 +1,8 @@
 import { env } from '@/utils/envConfig';
 import { Collection, Db, MongoClient } from 'mongodb';
 import { Product_DbEntity } from './repos/products/product.model';
+import { Token_DbEntity } from './repos/refreshToken/token.model';
 import { Review_DbEntity } from './repos/reviews/review.model';
-import { Token_DbEntity } from './repos/token/token.model';
 import { User_DbEntity } from './repos/users/user.model';
 
 interface DatabaseCollections {

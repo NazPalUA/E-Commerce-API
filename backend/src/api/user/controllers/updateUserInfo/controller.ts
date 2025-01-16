@@ -1,4 +1,4 @@
-import { tokenRepo } from '@/db/repos/token/token.repo';
+import { tokenRepo } from '@/db/repos/refreshToken/token.repo';
 import { userRepo } from '@/db/repos/users/user.repo';
 import { NotFoundError } from '@/errors/not-found-error';
 import { UnauthorizedError } from '@/errors/unauthorized-error';
