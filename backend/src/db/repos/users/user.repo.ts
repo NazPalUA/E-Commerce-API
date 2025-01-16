@@ -6,8 +6,8 @@ import { collections } from '../..';
 import { UserRoles } from './constants';
 import {
   getUserDTO,
-  NewUser,
   User_DbEntity,
+  User_DbEntity_Input,
   User_DbEntity_Schema,
   User_DTO,
 } from './user.model';
@@ -30,7 +30,7 @@ export class UserRepository {
       : false;
   }
 
-  public async insertUser(user: NewUser): Promise<User_DTO> {
+  public async insertUser(user: User_DbEntity_Input): Promise<User_DTO> {
     const isFirstUser = (await this.countDocuments()) === 0;
 
     const candidate = User_DbEntity_Schema.parse({

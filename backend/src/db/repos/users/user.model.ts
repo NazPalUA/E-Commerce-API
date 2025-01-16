@@ -6,7 +6,7 @@ import { UserRoles } from './constants';
 extendZodWithOpenApi(z);
 
 export type User_DbEntity = z.infer<typeof User_DbEntity_Schema>;
-export type NewUser = z.input<typeof User_DbEntity_Schema>;
+export type User_DbEntity_Input = z.input<typeof User_DbEntity_Schema>;
 
 export const User_DbEntity_Schema = z
   .object({
