@@ -34,23 +34,34 @@ export async function connectDB(): Promise<Db> {
     collections.tokens = db.collection<Token_DbEntity>(env.TOKENS_COLLECTION);
 
     // Create indexes
-    await collections.users.createIndex({ email: 1 }, { unique: true });
-    await collections.users.createIndex({ role: 1 });
-    await collections.products.createIndex({ user: 1 });
-    await collections.products.createIndex({ featured: 1 });
-    await collections.products.createIndex({ category: 1 });
-    await collections.products.createIndex({ company: 1 });
-    await collections.reviews.createIndex({ user: 1 });
-    await collections.reviews.createIndex({ product: 1 });
-    // user may only leave one review per product
-    await collections.reviews.createIndex(
-      { user: 1, product: 1 },
-      { unique: true }
-    );
-    await collections.tokens.createIndexes([
-      { key: { user: 1 } },
-      { key: { refreshToken: 1 }, unique: true },
-      { key: { createdAt: 1 }, expireAfterSeconds: 60 * 60 * 24 * 7 }, // TTL index
+    await Promise.all([
+      // User indexes
+      collections.users.createIndexes([
+        { key: { email: 1 }, unique: true },
+        { key: { role: 1 } },
+      ]),
+
+      // Product indexes
+      collections.products.createIndexes([
+        { key: { user: 1 } },
+        { key: { featured: 1 } },
+        { key: { category: 1 } },
+        { key: { company: 1 } },
+      ]),
+
+      // Review indexes
+      collections.reviews.createIndexes([
+        { key: { user: 1 } },
+        { key: { product: 1 } },
+        { key: { user: 1, product: 1 }, unique: true }, // User may only leave one review per product
+      ]),
+
+      // Token indexes
+      collections.tokens.createIndexes([
+        { key: { user: 1 } },
+        { key: { refreshToken: 1 }, unique: true },
+        { key: { createdAt: 1 }, expireAfterSeconds: 604800 }, // TTL index (7 days)
+      ]),
     ]);
 
     console.log(`Successfully connected to database: ${db.databaseName}`);
