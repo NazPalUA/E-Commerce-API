@@ -105,6 +105,10 @@ export class TokenRepository {
     return result.deletedCount === 1;
   }
 
+  public async deleteTokenByUserId(userId: string): Promise<void> {
+    await this.collection.deleteMany({ user: new ObjectId(userId) });
+  }
+
   public async cleanupExpiredTokens(): Promise<void> {
     const expiryDate = new Date();
     expiryDate.setDate(expiryDate.getDate() - 7); // Remove tokens older than 7 days
