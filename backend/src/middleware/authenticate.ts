@@ -2,16 +2,15 @@ import { tokenRepo } from '@/db/repos/refreshToken/refreshToken.repo';
 import { UserRole } from '@/db/repos/users/constants';
 import { userRepo } from '@/db/repos/users/user.repo';
 import { DecodedAccessJWT_Schema } from '@/models/AccessToken';
-import { attachAuthCookiesToResponse } from '@/utils/auth/authCookies';
+import {
+  attachAuthCookiesToResponse,
+  generateRandomToken,
+  getTokenPayloadFromUser,
+} from '@/utils/auth';
 import { NextFunction, Request, Response } from 'express';
 import { ForbiddenError } from '../errors/forbidden-error';
 import { UnauthorizedError } from '../errors/unauthorized-error';
-import {
-  createAccessJWT,
-  generateRandomToken,
-  getTokenPayloadFromUser,
-  verifyAccessJWT,
-} from '../utils/auth/jwt';
+import { createAccessJWT, verifyAccessJWT } from '../utils/auth';
 
 export const authenticate = async (
   req: Request,

@@ -1,7 +1,7 @@
 import { userRepo } from '@/db/repos/users/user.repo';
 import { ServiceResponse } from '@/models/serviceResponse';
+import { generateRandomToken } from '@/utils/auth';
 import { handleServiceResponse, validateReq } from '@/utils/httpHandlers';
-import { generateRandomToken } from '@/utils/jwt';
 import { sendVerificationEmail } from '@/utils/mail/sendVerificationEmail';
 import { Request, RequestHandler, Response } from 'express';
 import { Register_Req_Schema, Register_ResBodyObj } from './model';

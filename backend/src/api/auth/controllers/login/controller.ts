@@ -5,12 +5,12 @@ import { BadRequestError } from '@/errors/bad-request-error';
 import { InternalServerError } from '@/errors/server-error';
 import { UnauthorizedError } from '@/errors/unauthorized-error';
 import { ServiceResponse } from '@/models/serviceResponse';
-import { attachAuthCookiesToResponse } from '@/utils/auth/authCookies';
 import {
+  attachAuthCookiesToResponse,
   createAccessJWT,
   generateRandomToken,
   getTokenPayloadFromUser,
-} from '@/utils/auth/jwt';
+} from '@/utils/auth';
 import { handleServiceResponse, validateReq } from '@/utils/httpHandlers';
 import { Request, RequestHandler, Response } from 'express';
 import { Login_Req_Schema, Login_ResBodyObj } from './model';

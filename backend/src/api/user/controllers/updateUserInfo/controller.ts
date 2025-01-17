@@ -3,12 +3,12 @@ import { userRepo } from '@/db/repos/users/user.repo';
 import { NotFoundError } from '@/errors/not-found-error';
 import { UnauthorizedError } from '@/errors/unauthorized-error';
 import { ServiceResponse } from '@/models/serviceResponse';
-import { attachAuthCookiesToResponse } from '@/utils/auth/authCookies';
 import {
+  attachAuthCookiesToResponse,
   createAccessJWT,
   generateRandomToken,
   getTokenPayloadFromUser,
-} from '@/utils/auth/jwt';
+} from '@/utils/auth';
 import { handleServiceResponse, validateReq } from '@/utils/httpHandlers';
 import type { Request, RequestHandler, Response } from 'express';
 import { UpdateUserInfo_Req_Schema, UpdateUserInfo_ResBodyObj } from './model';

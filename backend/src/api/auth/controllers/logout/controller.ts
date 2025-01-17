@@ -1,7 +1,7 @@
 import { tokenRepo } from '@/db/repos/refreshToken/refreshToken.repo';
 import { BadRequestError } from '@/errors/bad-request-error';
 import { ServiceResponse } from '@/models/serviceResponse';
-import { clearCookies } from '@/utils/auth/authCookies';
+import { clearCookies } from '@/utils/auth';
 import { handleServiceResponse } from '@/utils/httpHandlers';
 import { Request, RequestHandler, Response } from 'express';
 import { Logout_ResBodyObj } from './model';

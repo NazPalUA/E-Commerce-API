@@ -4,9 +4,7 @@ import {
   DecodedAccessJWT,
   DecodedAccessJWT_Schema,
 } from '@/models/AccessToken';
-import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
-import { User_DTO } from '../../db/repos/users/user.model';
 import { BadRequestError } from '../../errors/bad-request-error';
 import { env } from '../envConfig';
 
@@ -32,13 +30,4 @@ export const decodeAccessJWT = (token: string): DecodedAccessJWT => {
   } catch (error) {
     throw new BadRequestError('Invalid token');
   }
-};
-
-export const getTokenPayloadFromUser = (user: User_DTO): AccessJWTPayload => {
-  const { id, name, email, role } = user;
-  return { id, name, email, role };
-};
-
-export const generateRandomToken = () => {
-  return crypto.randomBytes(32).toString('hex');
 };
