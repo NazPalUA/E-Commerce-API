@@ -17,15 +17,10 @@ export const resetPassword: RequestHandler = async (
   const user = await userRepo.findUserByEmail(email);
   if (!user) throw new NotFoundError('User');
 
-  const isPasswordResetTokenCorrect = resetToken === user.passwordResetToken;
-  if (!isPasswordResetTokenCorrect)
-    throw new BadRequestError('Invalid reset token');
-
-  const isPasswordResetTokenValid =
-    user.passwordResetTokenExpiration &&
-    user.passwordResetTokenExpiration > new Date();
-  if (!isPasswordResetTokenValid)
-    throw new BadRequestError('Reset token expired');
+  const isPasswordResetTokenCorrectAndValid =
+    await userRepo.checkPasswordResetToken(email, resetToken);
+  if (!isPasswordResetTokenCorrectAndValid)
+    throw new BadRequestError('Invalid or expired reset token');
 
   await userRepo.resetPassword(user.id, newPassword);
 

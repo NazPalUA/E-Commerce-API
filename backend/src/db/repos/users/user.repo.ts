@@ -1,21 +1,34 @@
 import { BadRequestError } from '@/errors/bad-request-error';
+import { InternalServerError } from '@/errors/server-error';
 import { UnauthorizedError } from '@/errors/unauthorized-error';
 import bcrypt from 'bcrypt';
 import { Collection, ObjectId } from 'mongodb';
 import { collections } from '../..';
 import { UserRoles } from './constants';
 import {
-  getUserDTO,
   User_DbEntity,
   User_DbEntity_Input,
   User_DbEntity_Schema,
   User_DTO,
+  User_DTO_Schema,
 } from './user.model';
 
 class UserRepository {
   private get collection(): Collection<User_DbEntity> {
     return collections.users;
   }
+
+  private getDTO = (entity: User_DbEntity): User_DTO => {
+    const { _id, ...rest } = entity;
+    const candidate = {
+      id: _id.toHexString(),
+      ...rest,
+    };
+    const userDTO = User_DTO_Schema.safeParse(candidate);
+    if (!userDTO.success)
+      throw new InternalServerError('Failed to parse user DTO');
+    return userDTO.data;
+  };
 
   private async countDocuments(): Promise<number> {
     return this.collection.countDocuments();
@@ -43,7 +56,7 @@ class UserRepository {
       role: isFirstUser ? UserRoles.ADMIN : UserRoles.USER,
     });
     const result = await this.collection.insertOne(candidate);
-    const userDTO = getUserDTO({
+    const userDTO = this.getDTO({
       ...candidate,
       _id: result.insertedId,
     });
@@ -59,6 +72,23 @@ class UserRepository {
       { projection: { verificationToken: 1 } }
     );
     return user?.verificationToken === verificationToken;
+  }
+
+  public async checkPasswordResetToken(
+    userEmail: string,
+    passwordResetToken: string
+  ): Promise<boolean> {
+    const user = await this.collection.findOne({ email: userEmail });
+    if (!user) return false;
+
+    const isPasswordResetTokenCorrect =
+      user.passwordResetToken === passwordResetToken;
+    if (!isPasswordResetTokenCorrect) return false;
+
+    const isPasswordResetTokenValid =
+      user.passwordResetTokenExpiration &&
+      user.passwordResetTokenExpiration > new Date();
+    return isPasswordResetTokenValid === true;
   }
 
   public async verifyUser(userId: string): Promise<void> {
@@ -85,7 +115,7 @@ class UserRepository {
       { returnDocument: 'after', projection: { password: 0 } }
     );
 
-    return updatedUser ? getUserDTO(updatedUser) : null;
+    return updatedUser ? this.getDTO(updatedUser) : null;
   }
 
   public async updatePassword(
@@ -142,7 +172,7 @@ class UserRepository {
       .find({ role: 'user' }, { projection: { password: 0 } })
       .toArray()
       .then(users => {
-        return users.map(user => getUserDTO(user));
+        return users.map(user => this.getDTO(user));
       });
   }
 
@@ -150,7 +180,7 @@ class UserRepository {
     return this.collection
       .findOne({ _id: new ObjectId(userId) }, { projection: { password: 0 } })
       .then(user => {
-        return user ? getUserDTO(user) : null;
+        return user ? this.getDTO(user) : null;
       });
   }
 
@@ -158,7 +188,7 @@ class UserRepository {
     return this.collection
       .findOne({ email }, { projection: { password: 0 } })
       .then(user => {
-        return user ? getUserDTO(user) : null;
+        return user ? this.getDTO(user) : null;
       });
   }
 }

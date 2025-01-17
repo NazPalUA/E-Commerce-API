@@ -3,44 +3,43 @@ import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import bcrypt from 'bcrypt';
 import { z } from 'zod';
 import { UserRoles } from './constants';
+
 extendZodWithOpenApi(z);
 
+// Base user schema that is used for both DB entity and DTO
+const BaseUserSchema = z.object({
+  name: z.string().min(3).max(50),
+  email: z.string().email(),
+  role: z.nativeEnum(UserRoles),
+  isVerified: z.boolean(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+// Database entity schema
 export type User_DbEntity = z.infer<typeof User_DbEntity_Schema>;
 export type User_DbEntity_Input = z.input<typeof User_DbEntity_Schema>;
 
-export const User_DbEntity_Schema = z
-  .object({
-    _id: commonValidations.objectId,
-    name: z.string().min(3).max(50),
-    email: z.string().email(),
-    password: commonValidations.password.transform(password =>
-      bcrypt.hashSync(password, 10)
-    ),
-    verificationToken: z.string().optional(),
-    isVerified: z.boolean().default(false),
-    verifiedDate: z.date().optional(),
-    role: z.nativeEnum(UserRoles).default(UserRoles.USER),
-    passwordResetToken: z.string().optional(),
-    passwordResetTokenExpiration: z.date().optional(),
-    createdAt: z.date().default(new Date()),
-    updatedAt: z.date().default(new Date()),
-  })
-  .strict();
+export const User_DbEntity_Schema = BaseUserSchema.extend({
+  _id: commonValidations.objectId,
 
-// User DTO Schema
-export type User_DTO = z.infer<typeof User_DTO_Schema>;
-export const User_DTO_Schema = User_DbEntity_Schema.omit({
-  _id: true,
-  password: true,
-  verificationToken: true,
-}).extend({
-  id: commonValidations.id,
+  role: z.nativeEnum(UserRoles).default(UserRoles.USER),
+  isVerified: BaseUserSchema.shape.isVerified.default(false),
+  createdAt: BaseUserSchema.shape.createdAt.default(new Date()),
+  updatedAt: BaseUserSchema.shape.updatedAt.default(new Date()),
+
+  password: commonValidations.password.transform(password =>
+    bcrypt.hashSync(password, 10)
+  ),
+  verificationToken: z.string().optional(),
+  verifiedDate: z.date().optional(),
+  passwordResetToken: z.string().optional(),
+  passwordResetTokenExpiration: z.date().optional(),
 });
 
-export const getUserDTO = (user: User_DbEntity): User_DTO => {
-  const { _id, password, verificationToken, ...rest } = user;
-  return {
-    ...rest,
-    id: _id.toString(),
-  };
-};
+// DTO schema
+export type User_DTO = z.infer<typeof User_DTO_Schema>;
+export const User_DTO_Schema = z.object({
+  id: commonValidations.id,
+  ...BaseUserSchema.shape,
+});

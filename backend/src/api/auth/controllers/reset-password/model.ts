@@ -13,7 +13,7 @@ export type ResetPassword_ReqBody = z.infer<
 >;
 export const ResetPassword_ReqBody_Schema = z.object({
   email: User_DTO_Schema.shape.email,
-  resetToken: User_DTO_Schema.shape.passwordResetToken,
+  resetToken: z.string(),
   newPassword: commonValidations.password,
 });
 
