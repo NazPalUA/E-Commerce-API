@@ -1,4 +1,4 @@
-import { tokenRepo } from '@/db/repos/refreshToken/refreshToken.repo';
+import { refreshTokenRepo } from '@/db/repos/refreshToken/refreshToken.repo';
 import { UserRole } from '@/db/repos/users/constants';
 import { userRepo } from '@/db/repos/users/user.repo';
 import { DecodedAccessJWT_Schema } from '@/models/AccessToken';
@@ -35,7 +35,7 @@ export const authenticate = async (
     }
 
     // Use refreshToken directly from cookies
-    const token = await tokenRepo.findTokenByRefreshToken(
+    const token = await refreshTokenRepo.findTokenByRefreshToken(
       refreshToken as string
     );
     if (!token?.isValid) throw new UnauthorizedError('Invalid refresh token');
@@ -46,8 +46,8 @@ export const authenticate = async (
     const userPayload = getTokenPayloadFromUser(user);
     const newRefreshToken = generateRandomToken();
 
-    await tokenRepo.invalidateUserTokens(user.id);
-    await tokenRepo.insertToken({
+    await refreshTokenRepo.invalidateUserTokens(user.id);
+    await refreshTokenRepo.insertToken({
       user: user.id,
       refreshToken: newRefreshToken,
       ip: req.ip || '',

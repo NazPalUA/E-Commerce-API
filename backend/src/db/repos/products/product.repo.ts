@@ -9,7 +9,7 @@ import {
   Product_DTO,
 } from './product.model';
 
-export class ProductRepository {
+class ProductRepository {
   private get collection(): Collection<Product_DbEntity> {
     return collections.products;
   }
@@ -79,13 +79,6 @@ export class ProductRepository {
     return this.collection
       .findOne({ _id: new ObjectId(productId) })
       .then(product => (product ? getProductDTO(product) : null));
-  }
-
-  public async findProductsByUser(userId: string): Promise<Product_DTO[]> {
-    return this.collection
-      .find({ user: new ObjectId(userId) })
-      .toArray()
-      .then(products => products.map(product => getProductDTO(product)));
   }
 
   public async deleteProduct(

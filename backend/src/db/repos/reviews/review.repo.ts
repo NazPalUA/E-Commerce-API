@@ -10,9 +10,17 @@ import {
   Review_DTO,
 } from './review.model';
 
-export class ReviewRepository {
+class ReviewRepository {
   private get collection(): Collection<Review_DbEntity> {
     return collections.reviews;
+  }
+
+  private async checkReviewExists(reviewId: string): Promise<boolean> {
+    const review = await this.collection.findOne(
+      { _id: new ObjectId(reviewId) },
+      { projection: { _id: 1 } }
+    );
+    return review !== null;
   }
 
   public async isReviewOwner(
@@ -27,14 +35,6 @@ export class ReviewRepository {
       { projection: { user: 1 } }
     );
     return review?.user.toString() === userId;
-  }
-
-  public async checkReviewExists(reviewId: string): Promise<boolean> {
-    const review = await this.collection.findOne(
-      { _id: new ObjectId(reviewId) },
-      { projection: { _id: 1 } }
-    );
-    return review !== null;
   }
 
   public async insertReview(
@@ -94,13 +94,6 @@ export class ReviewRepository {
     return this.collection
       .findOne({ _id: new ObjectId(reviewId) })
       .then(review => (review ? getReviewDTO(review) : null));
-  }
-
-  public async findReviewsByUser(userId: string): Promise<Review_DTO[]> {
-    return this.collection
-      .find({ user: new ObjectId(userId) })
-      .toArray()
-      .then(reviews => reviews.map(review => getReviewDTO(review)));
   }
 
   public async findReviewsByProduct(productId: string): Promise<Review_DTO[]> {

@@ -1,4 +1,4 @@
-import { tokenRepo } from '@/db/repos/refreshToken/refreshToken.repo';
+import { refreshTokenRepo } from '@/db/repos/refreshToken/refreshToken.repo';
 import { userRepo } from '@/db/repos/users/user.repo';
 import { NotFoundError } from '@/errors/not-found-error';
 import { UnauthorizedError } from '@/errors/unauthorized-error';
@@ -31,8 +31,8 @@ export const updateUserInfo: RequestHandler = async (
   const newRefreshToken = generateRandomToken();
 
   // Optionally, invalidate the old refresh tokens and store the new one in the database
-  await tokenRepo.invalidateUserTokens(userId);
-  await tokenRepo.insertToken({
+  await refreshTokenRepo.invalidateUserTokens(userId);
+  await refreshTokenRepo.insertToken({
     user: userId,
     refreshToken: newRefreshToken,
     ip: req.ip || '',

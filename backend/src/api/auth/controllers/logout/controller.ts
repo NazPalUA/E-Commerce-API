@@ -1,4 +1,4 @@
-import { tokenRepo } from '@/db/repos/refreshToken/refreshToken.repo';
+import { refreshTokenRepo } from '@/db/repos/refreshToken/refreshToken.repo';
 import { BadRequestError } from '@/errors/bad-request-error';
 import { ServiceResponse } from '@/models/serviceResponse';
 import { clearCookies } from '@/utils/auth';
@@ -11,7 +11,7 @@ export const logout: RequestHandler = async (req: Request, res: Response) => {
   if (!userId) throw new BadRequestError('User ID is required');
 
   clearCookies(res);
-  await tokenRepo.deleteTokenByUserId(userId);
+  await refreshTokenRepo.deleteTokenByUserId(userId);
 
   const serviceResponse = ServiceResponse.success<Logout_ResBodyObj>(
     'Logout successful',

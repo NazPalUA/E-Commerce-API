@@ -1,5 +1,5 @@
 import { RefreshToken_Input } from '@/db/repos/refreshToken/refreshToken.model';
-import { tokenRepo } from '@/db/repos/refreshToken/refreshToken.repo';
+import { refreshTokenRepo } from '@/db/repos/refreshToken/refreshToken.repo';
 import { userRepo } from '@/db/repos/users/user.repo';
 import { BadRequestError } from '@/errors/bad-request-error';
 import { InternalServerError } from '@/errors/server-error';
@@ -48,8 +48,8 @@ export const login: RequestHandler = async (req: Request, res: Response) => {
     isValid: true,
   };
 
-  await tokenRepo.invalidateUserTokens(user.id);
-  const newToken = await tokenRepo.insertToken(refreshTokenPayload);
+  await refreshTokenRepo.invalidateUserTokens(user.id);
+  const newToken = await refreshTokenRepo.insertToken(refreshTokenPayload);
 
   if (!newToken) throw new InternalServerError('Failed to create token');
 

@@ -12,9 +12,13 @@ import {
   User_DTO,
 } from './user.model';
 
-export class UserRepository {
+class UserRepository {
   private get collection(): Collection<User_DbEntity> {
     return collections.users;
+  }
+
+  private async countDocuments(): Promise<number> {
+    return this.collection.countDocuments();
   }
 
   public async checkPassword(
@@ -156,10 +160,6 @@ export class UserRepository {
       .then(user => {
         return user ? getUserDTO(user) : null;
       });
-  }
-
-  public async countDocuments(): Promise<number> {
-    return this.collection.countDocuments();
   }
 }
 
