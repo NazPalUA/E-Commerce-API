@@ -5,12 +5,13 @@ import { BadRequestError } from '@/errors/bad-request-error';
 import { InternalServerError } from '@/errors/server-error';
 import { UnauthorizedError } from '@/errors/unauthorized-error';
 import { ServiceResponse } from '@/models/serviceResponse';
-import { handleServiceResponse, validateReq } from '@/utils/httpHandlers';
+import { attachAuthCookiesToResponse } from '@/utils/auth/authCookies';
 import {
-  attachCookiesToResponse,
+  createAccessJWT,
   generateRandomToken,
   getTokenPayloadFromUser,
-} from '@/utils/jwt';
+} from '@/utils/auth/jwt';
+import { handleServiceResponse, validateReq } from '@/utils/httpHandlers';
 import { Request, RequestHandler, Response } from 'express';
 import { Login_Req_Schema, Login_ResBodyObj } from './model';
 export const login: RequestHandler = async (req: Request, res: Response) => {
@@ -52,7 +53,8 @@ export const login: RequestHandler = async (req: Request, res: Response) => {
 
   if (!newToken) throw new InternalServerError('Failed to create token');
 
-  attachCookiesToResponse(res, tokenUser, refreshToken);
+  const accessJWT = createAccessJWT(tokenUser);
+  attachAuthCookiesToResponse(res, accessJWT, refreshToken);
 
   const serviceResponse = ServiceResponse.success<Login_ResBodyObj>(
     'Login successful',

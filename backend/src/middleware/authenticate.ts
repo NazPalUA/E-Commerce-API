@@ -2,15 +2,16 @@ import { tokenRepo } from '@/db/repos/refreshToken/refreshToken.repo';
 import { UserRole } from '@/db/repos/users/constants';
 import { userRepo } from '@/db/repos/users/user.repo';
 import { DecodedAccessJWT_Schema } from '@/models/AccessToken';
+import { attachAuthCookiesToResponse } from '@/utils/auth/authCookies';
 import { NextFunction, Request, Response } from 'express';
 import { ForbiddenError } from '../errors/forbidden-error';
 import { UnauthorizedError } from '../errors/unauthorized-error';
 import {
-  attachCookiesToResponse,
+  createAccessJWT,
   generateRandomToken,
   getTokenPayloadFromUser,
   verifyAccessJWT,
-} from '../utils/jwt';
+} from '../utils/auth/jwt';
 
 export const authenticate = async (
   req: Request,
@@ -55,7 +56,8 @@ export const authenticate = async (
       isValid: true,
     });
 
-    attachCookiesToResponse(res, userPayload, newRefreshToken);
+    const accessJWT = createAccessJWT(userPayload);
+    attachAuthCookiesToResponse(res, accessJWT, newRefreshToken);
 
     req.userId = user.id;
     req.userRole = user.role;
