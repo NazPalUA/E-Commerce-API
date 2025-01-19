@@ -11,6 +11,8 @@ const getTokenPayloadFromUser = (user: User_DTO): AccessJWTPayload => {
   return { id, name, email, role };
 };
 
-export { attachAuthCookiesToResponse, clearCookies } from './authCookies';
+export { attachAuthCookiesToResponse, clearAuthCookies } from './authCookies';
 export { createAccessJWT, decodeAccessJWT, verifyAccessJWT } from './jwt';
 export { generateRandomToken, getTokenPayloadFromUser };
+
+export { createAuthTokensAndSetThemToCookies } from './createAuthTokensAndSetThemToCookies';

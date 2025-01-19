@@ -2,62 +2,48 @@ import { commonValidations } from '@/utils/commonValidation';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import { ObjectId } from 'mongodb';
 import { z } from 'zod';
+import { RefreshTokenRevokedReasons } from './constants';
 
 extendZodWithOpenApi(z);
 
-export type RefreshRefreshToken_DbEntity = z.infer<
-  typeof RefreshToken_DbEntity_Schema
->;
-export type RefreshToken_Input = z.input<typeof RefreshToken_DbEntity_Schema>;
+// Base refresh token schema for both DB entity and DTO
+const BaseRefreshTokenSchema = z.object({
+  refreshTokenSecret: z.string(),
+  ip: z.string(),
+  userAgent: z.string(),
 
-// Schema for token database entity (includes _id)
-export const RefreshToken_DbEntity_Schema = z
-  .object({
-    _id: commonValidations.objectId,
-    refreshToken: z.string(),
-    ip: z.string(),
-    userAgent: z.string(),
-
-    // Status fields
-    isValid: z.boolean().default(true),
-    revokedAt: z.date().nullable().optional(),
-    revokedReason: z
-      .enum([
-        'USER_LOGOUT',
-        'SECURITY_BREACH',
-        'TOKEN_REUSE',
-        'SUSPICIOUS_ACTIVITY',
-      ])
-      .nullable()
-      .optional(),
-
-    // Usage tracking
-    lastUsedAt: z.date().optional(),
-    replacedByToken: z.string().nullable().optional(), // For token rotation
-
-    // Relations and timestamps
-    user: z.string().transform(id => new ObjectId(id)),
-    createdAt: z.date().default(new Date()),
-    updatedAt: z.date().default(new Date()),
-  })
-  .strict();
-
-export type RefreshToken_DTO = z.infer<typeof RefreshToken_DTO_Schema>;
-export const RefreshToken_DTO_Schema = RefreshToken_DbEntity_Schema.omit({
-  _id: true,
-  user: true,
-}).extend({
-  id: commonValidations.id,
-  userId: commonValidations.id,
+  isValid: z.boolean(),
+  revokedAt: z.date().optional(),
+  revokedReason: z.nativeEnum(RefreshTokenRevokedReasons).optional(),
+  lastUsedAt: z.date().optional(),
+  replacedByToken: z.string().optional(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
 });
 
-export const getTokenDTO = (
-  token: RefreshRefreshToken_DbEntity
-): RefreshToken_DTO => {
-  const { _id, user, ...rest } = token;
-  return {
-    ...rest,
-    id: _id.toString(),
-    userId: user.toString(),
-  };
-};
+// Fix type name and use BaseRefreshTokenSchema
+export type RefreshToken_DbEntity = z.infer<
+  typeof RefreshToken_DbEntity_Schema
+>;
+export type RefreshToken_DbEntity_Input = z.input<
+  typeof RefreshToken_DbEntity_Schema
+>;
+
+export const RefreshToken_DbEntity_Schema = BaseRefreshTokenSchema.extend({
+  _id: commonValidations.objectId,
+  user: z.string().transform(id => new ObjectId(id)),
+
+  // Set defaults
+  isValid: BaseRefreshTokenSchema.shape.isValid.default(true),
+  createdAt: BaseRefreshTokenSchema.shape.createdAt.default(new Date()),
+  updatedAt: BaseRefreshTokenSchema.shape.updatedAt.default(new Date()),
+}).strict();
+
+export type RefreshToken_DTO = z.infer<typeof RefreshToken_DTO_Schema>;
+export type RefreshToken_DTO_Input = z.input<typeof RefreshToken_DTO_Schema>;
+
+export const RefreshToken_DTO_Schema = z.object({
+  id: commonValidations.id,
+  userId: commonValidations.id,
+  ...BaseRefreshTokenSchema.shape,
+});

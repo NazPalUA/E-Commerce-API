@@ -7,19 +7,23 @@ import { Request, RequestHandler, Response } from 'express';
 import { Register_Req_Schema, Register_ResBodyObj } from './model';
 
 export const register: RequestHandler = async (req: Request, res: Response) => {
-  const { body } = validateReq(req, Register_Req_Schema);
+  const {
+    body: { name, email, password },
+  } = validateReq(req, Register_Req_Schema);
 
   const verificationToken = generateRandomToken();
 
-  const insertedUser = await userRepo.insertUser({
-    ...body,
+  const insertedUser = await userRepo.registerNew({
+    name,
+    email,
+    password,
     verificationToken,
   });
 
   await sendVerificationEmail({
-    to: body.email,
+    to: email,
     verificationToken,
-    name: body.name,
+    name,
   });
 
   const serviceResponse = ServiceResponse.success<Register_ResBodyObj>(

@@ -1,15 +1,16 @@
+import { User_DTO } from '@/db/repos/users/user.model';
 import { BadRequestError } from '@/errors/bad-request-error';
+import { NotFoundError } from '@/errors/not-found-error';
 import { InternalServerError } from '@/errors/server-error';
 import { UnauthorizedError } from '@/errors/unauthorized-error';
+import { AccessJWTPayload } from '@/models/AccessToken';
 import bcrypt from 'bcrypt';
 import { Collection, ObjectId } from 'mongodb';
 import { collections } from '../..';
 import { UserRoles } from './constants';
 import {
   User_DbEntity,
-  User_DbEntity_Input,
   User_DbEntity_Schema,
-  User_DTO,
   User_DTO_Schema,
 } from './user.model';
 
@@ -34,88 +35,188 @@ class UserRepository {
     return this.collection.countDocuments();
   }
 
-  public async checkPassword(
+  private async checkPassword(
     userId: string,
     candidatePassword: string
   ): Promise<boolean> {
     const user = (await this.collection.findOne(
       { _id: new ObjectId(userId) },
-      { projection: { password: 1 } }
+      { projection: { password: 1, _id: 0 } }
     )) as Pick<User_DbEntity, 'password'>;
-    return user
-      ? await bcrypt.compare(candidatePassword, user.password)
-      : false;
+    if (!user) throw new NotFoundError('User not found');
+
+    const isPasswordCorrect = await bcrypt.compare(
+      candidatePassword,
+      user.password
+    );
+
+    return isPasswordCorrect;
   }
 
-  public async insertUser(user: User_DbEntity_Input): Promise<User_DTO> {
+  public async registerNew(
+    user: Pick<
+      User_DbEntity,
+      'name' | 'email' | 'password' | 'verificationToken'
+    >
+  ): Promise<User_DTO> {
     const isFirstUser = (await this.countDocuments()) === 0;
 
-    const candidate = User_DbEntity_Schema.parse({
-      ...user,
+    const candidate = User_DbEntity_Schema.safeParse({
       _id: new ObjectId(),
       role: isFirstUser ? UserRoles.ADMIN : UserRoles.USER,
+      ...user,
     });
-    const result = await this.collection.insertOne(candidate);
+    if (!candidate.success)
+      throw new InternalServerError('Failed to parse user');
+
+    const result = await this.collection.insertOne(candidate.data);
+    if (!result.acknowledged)
+      throw new InternalServerError('Failed to insert user');
+
     const userDTO = this.getDTO({
-      ...candidate,
+      ...candidate.data,
       _id: result.insertedId,
     });
     return userDTO;
   }
 
-  public async checkVerificationToken(
-    userEmail: string,
-    verificationToken: string
-  ): Promise<boolean> {
-    const user = await this.collection.findOne(
-      { email: userEmail },
-      { projection: { verificationToken: 1 } }
+  public async verify(email: string, verificationToken: string): Promise<void> {
+    const user = (await this.collection.findOne(
+      { email },
+      { projection: { verificationToken: 1, isVerified: 1, _id: 0 } }
+    )) as Pick<User_DbEntity, 'verificationToken' | 'isVerified'>;
+    if (!user) throw new NotFoundError('User not found');
+
+    if (user.isVerified) throw new BadRequestError('Email already verified');
+
+    if (user.verificationToken !== verificationToken)
+      throw new BadRequestError('Invalid verification token');
+
+    const updateData: Partial<User_DbEntity> = {
+      isVerified: true,
+      verifiedDate: new Date(),
+      updatedAt: new Date(),
+      verificationToken: undefined,
+    };
+
+    const result = await this.collection.updateOne(
+      { email },
+      { $set: updateData }
     );
-    return user?.verificationToken === verificationToken;
+    if (result.modifiedCount === 0)
+      throw new InternalServerError('Failed to verify user');
+  }
+
+  public async checkPasswordAndVerification(
+    email: string,
+    candidatePassword: string
+  ): Promise<AccessJWTPayload> {
+    const projection = {
+      name: 1,
+      email: 1,
+      role: 1,
+      password: 1,
+      isVerified: 1,
+    };
+    const user = (await this.collection.findOne(
+      { email },
+      { projection }
+    )) as Pick<
+      User_DbEntity,
+      '_id' | 'password' | 'isVerified' | 'name' | 'email' | 'role'
+    >;
+
+    if (!user) throw new UnauthorizedError('Email or password is incorrect');
+
+    if (!user.isVerified) throw new UnauthorizedError('Email not verified');
+
+    const isPasswordCorrect = await bcrypt.compare(
+      candidatePassword,
+      user.password
+    );
+    if (!isPasswordCorrect)
+      throw new UnauthorizedError('Email or password is incorrect');
+
+    const accessJWTPayload: AccessJWTPayload = {
+      id: user._id.toHexString(),
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    };
+
+    return accessJWTPayload;
+  }
+
+  public async updatePasswordResetToken(
+    userId: string,
+    passwordResetToken: string,
+    passwordResetTokenExpiration: Date
+  ): Promise<void> {
+    const result = await this.collection.updateOne(
+      { _id: new ObjectId(userId) },
+      { $set: { passwordResetToken, passwordResetTokenExpiration } }
+    );
+    if (result.matchedCount === 0) throw new NotFoundError('User not found');
+
+    if (result.modifiedCount === 0)
+      throw new InternalServerError('Failed to update password reset token');
   }
 
   public async checkPasswordResetToken(
     userEmail: string,
     passwordResetToken: string
-  ): Promise<boolean> {
-    const user = await this.collection.findOne({ email: userEmail });
-    if (!user) return false;
+  ): Promise<void> {
+    const projection = {
+      passwordResetToken: 1,
+      passwordResetTokenExpiration: 1,
+      _id: 0,
+    };
+    const user = (await this.collection.findOne(
+      { email: userEmail },
+      { projection }
+    )) as Pick<
+      User_DbEntity,
+      'passwordResetToken' | 'passwordResetTokenExpiration'
+    >;
+    if (!user) throw new NotFoundError('User not found');
 
-    const isPasswordResetTokenCorrect =
-      user.passwordResetToken === passwordResetToken;
-    if (!isPasswordResetTokenCorrect) return false;
-
-    const isPasswordResetTokenValid =
-      user.passwordResetTokenExpiration &&
-      user.passwordResetTokenExpiration > new Date();
-    return isPasswordResetTokenValid === true;
+    if (
+      user.passwordResetToken !== passwordResetToken ||
+      !user.passwordResetTokenExpiration ||
+      user.passwordResetTokenExpiration < new Date()
+    )
+      throw new BadRequestError('Invalid or expired reset token');
   }
 
-  public async verifyUser(userId: string): Promise<void> {
-    await this.collection.updateOne(
+  public async resetPassword(
+    userId: string,
+    newPassword: string
+  ): Promise<void> {
+    const newHashedPassword =
+      User_DbEntity_Schema.shape.password.parse(newPassword);
+
+    const result = await this.collection.updateOne(
       { _id: new ObjectId(userId) },
-      {
-        $set: {
-          isVerified: true,
-          verifiedDate: new Date(),
-          updatedAt: new Date(),
-          verificationToken: undefined,
-        },
-      }
+      { $set: { password: newHashedPassword, updatedAt: new Date() } }
     );
+
+    if (!result.matchedCount) throw new NotFoundError('User not found');
+    if (result.modifiedCount === 0)
+      throw new InternalServerError('Failed to update password');
   }
 
   public async updateUser(
     userId: string,
-    userData: Partial<Pick<User_DTO, 'name' | 'email'>>
+    userData: Partial<Pick<User_DbEntity, 'name' | 'email'>>
   ): Promise<User_DTO | null> {
     const updatedUser = await this.collection.findOneAndUpdate(
       { _id: new ObjectId(userId) },
       { $set: { ...userData, updatedAt: new Date() } },
-      { returnDocument: 'after', projection: { password: 0 } }
+      { returnDocument: 'after' }
     );
+    if (!updatedUser) throw new NotFoundError('User not found');
 
-    return updatedUser ? this.getDTO(updatedUser) : null;
+    return this.getDTO(updatedUser);
   }
 
   public async updatePassword(
@@ -137,59 +238,29 @@ class UserRepository {
       { _id: new ObjectId(userId) },
       { $set: { password: newHashedPassword, updatedAt: new Date() } }
     );
+
+    if (!result.matchedCount) throw new NotFoundError('User not found');
     if (result.modifiedCount === 0)
-      throw new Error('Failed to update password');
+      throw new InternalServerError('Failed to update password');
   }
 
-  public async resetPassword(
-    userId: string,
-    newPassword: string
-  ): Promise<void> {
-    const newHashedPassword =
-      User_DbEntity_Schema.shape.password.parse(newPassword);
-
-    const result = await this.collection.updateOne(
-      { _id: new ObjectId(userId) },
-      { $set: { password: newHashedPassword, updatedAt: new Date() } }
-    );
-    if (result.modifiedCount === 0)
-      throw new Error('Failed to update password');
-  }
-
-  public async updateUserPasswordResetToken(
-    userId: string,
-    passwordResetToken: string,
-    passwordResetTokenExpiration: Date
-  ): Promise<void> {
-    await this.collection.updateOne(
-      { _id: new ObjectId(userId) },
-      { $set: { passwordResetToken, passwordResetTokenExpiration } }
-    );
-  }
-
-  public async findAllUsers(): Promise<User_DTO[]> {
-    return this.collection
+  public async findAll(): Promise<User_DTO[]> {
+    const users = await this.collection
       .find({ role: 'user' }, { projection: { password: 0 } })
-      .toArray()
-      .then(users => {
-        return users.map(user => this.getDTO(user));
-      });
+      .toArray();
+    return users.map(user => this.getDTO(user));
   }
 
   public async findUserById(userId: string): Promise<User_DTO | null> {
-    return this.collection
-      .findOne({ _id: new ObjectId(userId) }, { projection: { password: 0 } })
-      .then(user => {
-        return user ? this.getDTO(user) : null;
-      });
+    const user = await this.collection.findOne({
+      _id: new ObjectId(userId),
+    });
+    return user ? this.getDTO(user) : null;
   }
 
   public async findUserByEmail(email: string): Promise<User_DTO | null> {
-    return this.collection
-      .findOne({ email }, { projection: { password: 0 } })
-      .then(user => {
-        return user ? this.getDTO(user) : null;
-      });
+    const user = await this.collection.findOne({ email });
+    return user ? this.getDTO(user) : null;
   }
 }
 

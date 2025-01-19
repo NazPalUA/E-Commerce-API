@@ -9,9 +9,7 @@ import { Me_ResBodyObj } from './model';
 export const getMe: RequestHandler = async (req: Request, res: Response) => {
   const token = req.signedCookies['token'];
 
-  if (!token) {
-    throw new UnauthorizedError('Authentication token missing');
-  }
+  if (!token) throw new UnauthorizedError('Authentication token missing');
 
   const { iat, exp, ...payload } = decodeAccessJWT(token);
 

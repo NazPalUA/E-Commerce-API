@@ -1,7 +1,7 @@
 import { env } from '@/utils/envConfig';
 import { Collection, Db, MongoClient } from 'mongodb';
 import { Product_DbEntity } from './repos/products/product.model';
-import { RefreshRefreshToken_DbEntity } from './repos/refreshToken/refreshToken.model';
+import { RefreshToken_DbEntity } from './repos/refreshToken/refreshToken.model';
 import { Review_DbEntity } from './repos/reviews/review.model';
 import { User_DbEntity } from './repos/users/user.model';
 
@@ -9,7 +9,7 @@ interface DatabaseCollections {
   users: Collection<User_DbEntity>;
   products: Collection<Product_DbEntity>;
   reviews: Collection<Review_DbEntity>;
-  refreshTokens: Collection<RefreshRefreshToken_DbEntity>;
+  refreshTokens: Collection<RefreshToken_DbEntity>;
 }
 
 export const collections = {} as DatabaseCollections;
@@ -31,7 +31,7 @@ export async function connectDB(): Promise<Db> {
     collections.reviews = db.collection<Review_DbEntity>(
       env.REVIEWS_COLLECTION
     );
-    collections.refreshTokens = db.collection<RefreshRefreshToken_DbEntity>(
+    collections.refreshTokens = db.collection<RefreshToken_DbEntity>(
       env.TOKENS_COLLECTION
     );
 
@@ -64,7 +64,7 @@ export async function connectDB(): Promise<Db> {
       // Token indexes
       // collections.refreshTokens.dropIndexes(),
       collections.refreshTokens.createIndexes([
-        { key: { refreshToken: 1 }, unique: true },
+        { key: { refreshTokenSecret: 1 }, unique: true },
         { key: { user: 1 } },
         {
           key: { createdAt: 1 },

@@ -12,9 +12,7 @@ export const getSingleUser: RequestHandler = async (
   const { params } = validateReq(req, GetSingleUser_Req_Schema);
 
   const user = await userRepo.findUserById(params.id);
-  if (!user) {
-    throw new NotFoundError('User');
-  }
+  if (!user) throw new NotFoundError('User with this id not found');
 
   const serviceResponse = ServiceResponse.success<GetSingleUser_ResBodyObj>(
     'User found',

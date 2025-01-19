@@ -1,63 +1,103 @@
+import { NotFoundError } from '@/errors/not-found-error';
+import { InternalServerError } from '@/errors/server-error';
+import { UnauthorizedError } from '@/errors/unauthorized-error';
 import { ClientSession, Collection, ObjectId } from 'mongodb';
 import { collections } from '../..';
+import { RefreshTokenRevokedReason } from './constants';
 import {
-  getTokenDTO,
-  RefreshRefreshToken_DbEntity,
+  RefreshToken_DbEntity,
+  RefreshToken_DbEntity_Input,
   RefreshToken_DbEntity_Schema,
   RefreshToken_DTO,
-  RefreshToken_Input,
 } from './refreshToken.model';
 
 class RefreshTokenRepository {
-  private get collection(): Collection<RefreshRefreshToken_DbEntity> {
+  private get collection(): Collection<RefreshToken_DbEntity> {
     return collections.refreshTokens;
   }
 
-  public async insertToken(
-    token: RefreshToken_Input,
+  private getDTO = (token: RefreshToken_DbEntity): RefreshToken_DTO => {
+    const { _id, user, ...rest } = token;
+    return {
+      ...rest,
+      id: _id.toString(),
+      userId: user.toString(),
+    };
+  };
+
+  public async createNew(
+    token: Pick<
+      RefreshToken_DbEntity_Input,
+      'user' | 'refreshTokenSecret' | 'ip' | 'userAgent'
+    >,
     session?: ClientSession
   ): Promise<RefreshToken_DTO> {
-    const candidate = RefreshToken_DbEntity_Schema.parse({
+    const candidate = RefreshToken_DbEntity_Schema.safeParse({
       ...token,
       _id: new ObjectId(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
     });
-    const result = await this.collection.insertOne(candidate, { session });
-    const tokenDTO = getTokenDTO({
-      ...candidate,
+    if (!candidate.success)
+      throw new InternalServerError('Failed to parse refresh token');
+
+    const result = await this.collection.insertOne(candidate.data, { session });
+    if (!result.acknowledged)
+      throw new InternalServerError('Failed to insert refresh token');
+
+    const tokenDTO = this.getDTO({
+      ...candidate.data,
       _id: result.insertedId,
     });
 
     return tokenDTO;
   }
 
-  public async findTokenByRefreshToken(
-    refreshToken: string
-  ): Promise<RefreshToken_DTO | null> {
-    return this.collection
-      .findOne({ refreshToken })
-      .then(token => (token ? getTokenDTO(token) : null));
+  public async getUserIdByTokenSecret(
+    refreshTokenSecret: string
+  ): Promise<string> {
+    const token = await this.collection.findOne(
+      { refreshTokenSecret },
+      { projection: { user: 1, _id: 0 } }
+    );
+    if (!token) throw new NotFoundError('Refresh token');
+    return token.user.toString();
   }
 
-  public async deleteTokenByUserId(userId: string): Promise<void> {
-    await this.collection.deleteMany({ user: new ObjectId(userId) });
+  public async checkTokenSecret(refreshTokenSecret: string): Promise<void> {
+    const token = await this.collection.findOne(
+      { refreshTokenSecret },
+      { projection: { _id: 0, isValid: 1, createdAt: 1 } }
+    );
+    if (!token || !token.isValid)
+      throw new UnauthorizedError('Invalid refresh token');
+
+    if (token.createdAt < new Date(Date.now() - 1000 * 60 * 60 * 24))
+      throw new UnauthorizedError('Refresh token expired');
+
+    const result = await this.collection.updateOne(
+      { refreshTokenSecret },
+      { $set: { lastUsedAt: new Date(), updatedAt: new Date() } }
+    );
+    if (!result.acknowledged)
+      throw new InternalServerError('Failed to use refresh token');
   }
 
   public async invalidateUserTokens(
     userId: string,
-    exceptTokenId?: string
+    reason: RefreshTokenRevokedReason
   ): Promise<void> {
-    const query = exceptTokenId
-      ? {
-          user: new ObjectId(userId),
-          _id: { $ne: new ObjectId(exceptTokenId) },
-        }
-      : { user: new ObjectId(userId) };
-
-    await this.collection.updateMany(query, {
-      $set: { isValid: false, updatedAt: new Date() },
-    });
+    const result = await this.collection.updateMany(
+      { user: new ObjectId(userId) },
+      {
+        $set: {
+          isValid: false,
+          updatedAt: new Date(),
+          revokedAt: new Date(),
+          revokedReason: reason,
+        },
+      }
+    );
+    if (!result.acknowledged)
+      throw new InternalServerError('Failed to invalidate refresh token');
   }
 }
 

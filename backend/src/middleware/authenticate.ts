@@ -4,7 +4,6 @@ import { userRepo } from '@/db/repos/users/user.repo';
 import { DecodedAccessJWT_Schema } from '@/models/AccessToken';
 import {
   attachAuthCookiesToResponse,
-  generateRandomToken,
   getTokenPayloadFromUser,
 } from '@/utils/auth';
 import { NextFunction, Request, Response } from 'express';
@@ -17,50 +16,39 @@ export const authenticate = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const { token: accessToken, refreshToken } = req.signedCookies;
+  const { token: accessJWT, refreshTokenSecret } = req.signedCookies;
 
-  if (!accessToken && !refreshToken) {
-    throw new UnauthorizedError('Authentication token missing');
-  }
-
-  if (accessToken) {
-    const decodedJWT = verifyAccessJWT(accessToken);
+  // Authenticate with access token
+  if (accessJWT) {
+    const decodedJWT = verifyAccessJWT(accessJWT);
     const { id, role } = DecodedAccessJWT_Schema.parse(decodedJWT);
 
     req.userId = id;
     req.userRole = role;
-  } else {
-    if (!refreshToken) {
-      throw new UnauthorizedError('Refresh token missing');
-    }
 
-    // Use refreshToken directly from cookies
-    const token = await refreshTokenRepo.findTokenByRefreshToken(
-      refreshToken as string
-    );
-    if (!token?.isValid) throw new UnauthorizedError('Invalid refresh token');
-
-    const user = await userRepo.findUserById(token.userId.toString());
-    if (!user) throw new UnauthorizedError('User no longer exists');
-
-    const userPayload = getTokenPayloadFromUser(user);
-    const newRefreshToken = generateRandomToken();
-
-    await refreshTokenRepo.invalidateUserTokens(user.id);
-    await refreshTokenRepo.insertToken({
-      user: user.id,
-      refreshToken: newRefreshToken,
-      ip: req.ip || '',
-      userAgent: req.headers['user-agent'] || '',
-      isValid: true,
-    });
-
-    const accessJWT = createAccessJWT(userPayload);
-    attachAuthCookiesToResponse(res, accessJWT, newRefreshToken);
-
-    req.userId = user.id;
-    req.userRole = user.role;
+    next();
+    return;
   }
+
+  // Authenticate with refresh token
+  if (!refreshTokenSecret)
+    throw new UnauthorizedError('Authentication refresh token missing');
+
+  await refreshTokenRepo.checkTokenSecret(refreshTokenSecret);
+
+  const userId = await refreshTokenRepo.getUserIdByTokenSecret(
+    refreshTokenSecret
+  );
+  const user = await userRepo.findUserById(userId);
+  if (!user) throw new UnauthorizedError('User no longer exists');
+
+  const accessJWTPayload = getTokenPayloadFromUser(user);
+  const newAccessJWT = createAccessJWT(accessJWTPayload);
+
+  attachAuthCookiesToResponse(res, newAccessJWT, refreshTokenSecret);
+
+  req.userId = user.id;
+  req.userRole = user.role;
 
   next();
 };

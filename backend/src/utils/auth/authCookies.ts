@@ -36,9 +36,9 @@ const attachAuthCookiesToResponse = (
   setRefreshTokenCookie(res, oneWeek, refreshToken);
 };
 
-const clearCookies = (res: Response) => {
+const clearAuthCookies = (res: Response) => {
   setAccessJWTCookie(res, 0);
   setRefreshTokenCookie(res, 0);
 };
 
-export { attachAuthCookiesToResponse, clearCookies };
+export { attachAuthCookiesToResponse, clearAuthCookies };

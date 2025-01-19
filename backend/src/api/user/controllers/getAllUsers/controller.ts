@@ -9,10 +9,8 @@ export const getAllUsers: RequestHandler = async (
   _req: Request,
   res: Response
 ) => {
-  const users = await userRepo.findAllUsers();
-  if (!users.length) {
-    throw new NotFoundError('No Users');
-  }
+  const users = await userRepo.findAll();
+  if (!users.length) throw new NotFoundError('No Users Found');
 
   const serviceResponse = ServiceResponse.success<GetAllUsers_ResBodyObj>(
     'Users found',

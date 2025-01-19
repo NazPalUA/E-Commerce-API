@@ -1,10 +1,12 @@
 import { userRepo } from '@/db/repos/users/user.repo';
+import { NotFoundError } from '@/errors/not-found-error';
 import { ServiceResponse } from '@/models/serviceResponse';
+import { generateRandomToken } from '@/utils/auth';
 import { handleServiceResponse, validateReq } from '@/utils/httpHandlers';
 import { sendForgotPasswordEmail } from '@/utils/mail';
-import crypto from 'crypto';
 import { Request, RequestHandler, Response } from 'express';
 import { ForgotPassword_Req_Schema, ForgotPassword_ResBodyObj } from './model';
+
 export const forgotPassword: RequestHandler = async (
   req: Request,
   res: Response
@@ -14,19 +16,12 @@ export const forgotPassword: RequestHandler = async (
   } = validateReq(req, ForgotPassword_Req_Schema);
 
   const user = await userRepo.findUserByEmail(email);
-  if (!user) {
-    const serviceResponse = ServiceResponse.success<ForgotPassword_ResBodyObj>(
-      'User not found',
-      null
-    );
-    handleServiceResponse(serviceResponse, res);
-    return;
-  }
+  if (!user) throw new NotFoundError('User not found');
 
-  const passwordResetToken = crypto.randomBytes(32).toString('hex');
+  const passwordResetToken = generateRandomToken();
   const passwordResetTokenExpiration = new Date(Date.now() + 1000 * 60 * 30); // 0.5 hour
 
-  await userRepo.updateUserPasswordResetToken(
+  await userRepo.updatePasswordResetToken(
     user.id,
     passwordResetToken,
     passwordResetTokenExpiration
