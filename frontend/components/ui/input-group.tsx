@@ -7,6 +7,7 @@ interface InputGroupProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
   className?: string;
   action?: React.ReactNode;
+  error?: string;
 }
 
 export function InputGroup({
@@ -14,6 +15,7 @@ export function InputGroup({
   className,
   id,
   action,
+  error,
   ...props
 }: InputGroupProps) {
   return (
@@ -24,6 +26,7 @@ export function InputGroup({
       </div>
 
       <Input id={id} {...props} />
+      {error && <p className="text-sm text-red-500">{error}</p>}
     </div>
   );
 }
