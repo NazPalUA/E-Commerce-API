@@ -20,8 +20,8 @@ export function SignUpForm() {
   const router = useRouter();
 
   const onSubmit = async (data: SignUpFormData) => {
-    signUpAction(data);
-    router.push('/verify-email');
+    const { success } = await signUpAction(data);
+    if (success) router.push('/verify-email');
   };
 
   return (

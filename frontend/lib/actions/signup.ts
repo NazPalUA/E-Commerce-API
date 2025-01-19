@@ -9,27 +9,16 @@ export async function signUpAction(formData: SignUpFormData) {
     return { error: result.error.format() };
   }
 
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(result.data),
-      }
-    );
-
-    if (!response.ok) {
-      const error = await response.json();
-      return { error: error.message || 'Registration failed' };
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(result.data),
     }
+  );
 
-    return { success: true };
-  } catch (error: unknown) {
-    return {
-      error: (error as Error).message || 'Failed to connect to the server',
-    };
-  }
+  return { success: response.ok };
 }
