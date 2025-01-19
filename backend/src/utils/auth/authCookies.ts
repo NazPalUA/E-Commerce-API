@@ -16,13 +16,13 @@ const setTokenCookie = (
 };
 
 const setAccessJWTCookie = (res: Response, expiresIn: number, token?: string) =>
-  setTokenCookie('accessToken', res, expiresIn, token);
+  setTokenCookie('accessJWT', res, expiresIn, token);
 
 const setRefreshTokenCookie = (
   res: Response,
   expiresIn: number,
   token?: string
-) => setTokenCookie('refreshToken', res, expiresIn, token);
+) => setTokenCookie('refreshTokenSecret', res, expiresIn, token);
 
 const attachAuthCookiesToResponse = (
   res: Response,

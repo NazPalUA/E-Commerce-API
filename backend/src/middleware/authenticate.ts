@@ -16,7 +16,7 @@ export const authenticate = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const { token: accessJWT, refreshTokenSecret } = req.signedCookies;
+  const { accessJWT, refreshTokenSecret } = req.signedCookies;
 
   // Authenticate with access token
   if (accessJWT) {
