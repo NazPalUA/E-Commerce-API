@@ -14,7 +14,9 @@ export const sendVerificationEmail = async ({
 }: SendVerificationEmailParams) => {
   const verificationUrl = `${
     env.FRONTEND_URL
-  }/verify-email?token=${verificationToken}&email=${encodeURIComponent(to)}`;
+  }/verify-email?verificationToken=${verificationToken}&email=${encodeURIComponent(
+    to
+  )}`;
 
   const html = `
     <!DOCTYPE html>
